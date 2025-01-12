@@ -1,17 +1,12 @@
 <template>
   <div id="editor" class="container">
-    <div id="topbar" style="background-color: lightblue; height: 24px; display: flex; align-items: center; padding-left: 8px">
-      <p>{{ path }}</p>
-      <button @click="saveFile" style="border: 0">Salvar</button>
-    </div>
-    <div ref="refEditor" style="flex: 1 1 0%" />
+    <div ref="refEditor" style="height: 100%" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUpdated, ref } from "vue";
 import * as monacoEditor from "monaco-editor"
-import type { CustomFile } from "@/models/file";
 
 let editor: monacoEditor.editor.IStandaloneCodeEditor;
 
@@ -24,29 +19,47 @@ const fileFormatMap = new Map<string, string>([
   ["json", "json"],
 ]);
 
-const props = defineProps<{ path: string, fileContent: string, language: string }>();
-const emits = defineEmits<{ (e: "save", fileTempContent: string): void, (e: "change", fileTempContent: string): void }>();
+const props = defineProps<{ fileContent: string, language: string }>();
+const emits = defineEmits<{ (e: "change", fileTempContent: string): void }>();
 
 const refEditor = ref<HTMLElement>();
 
 onMounted(async () => {
-  if (refEditor.value && props.fileContent && props.language)
+  if (refEditor.value && props.fileContent && props.language) {
+    monacoEditor.editor.defineTheme("ire", {
+      base: "hc-light",
+      inherit: true,
+      rules: [],
+      colors: {
+        // "focusBorder": "transparent",
+        // "contrastBorder": "#fff",
+        // "scrollbar.shadow": "#fff",
+        // "scrollbarSlider.background": "#fff", // Slider background color.
+        // "scrollbarSlider.hoverBackground": "#fff", // Slider background color when hovering.
+        // "scrollbarSlider.activeBackground": "#fff"
+      },
+    });
+
+    monacoEditor.editor.setTheme("ire");
+
     editor = monacoEditor.editor.create(refEditor.value, {
       value: await props.fileContent,
       language: fileFormatMap.get(props.language),
       lineNumbers: "off",
       roundedSelection: false,
-      scrollBeyondLastLine: false,
+      scrollBeyondLastLine: true,
       readOnly: false,
       minimap: {
         enabled: false,
       },
-      theme: "vs",
+      wordWrap: "off",
+      overviewRulerBorder: false,
     });
+  }
 
-    editor.getModel()?.onDidChangeContent((e) => {
-      emits("change", editor.getModel()?.getValue() ?? "");
-    })
+  editor.getModel()?.onDidChangeContent(() => {
+    emits("change", editor.getModel()?.getValue() ?? "");
+  })
 });
 
 onUpdated(async () => {
@@ -58,18 +71,14 @@ onUpdated(async () => {
   }
 });
 
-async function saveFile() {
-  emits("save", editor.getValue());
-}
-
 </script>
 
 <style scoped>
-#editor.container {
+/* #editor.container {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   width: 100%;
   height: 100%;
-}
+} */
 </style>

@@ -14,6 +14,7 @@ este projeto consiste em testar um pouco as capacidades de
 [x] ver a renderizacao do markdown em html com o arquivo selecionado no editor
 [x] salvar o arquivo com o texto alterado no browser pro arquivo local
 [x] atualizacao reativa do texto no markdown renderizado
+[x] carregar uma fonte bonita (JetBrains Mono) tanto no editor quanto na interface
 [ ] sistema de plugins (seguindo na ordem, katex, mermaid)
 [ ] sistema de plugins de scripts js simples (pensar um pouco melhor nessa ideia)
-[ ] carregar uma fonte bonita (JetBrains Mono) tanto no editor quanto na interface
+[ ] pensar em uma interface simples

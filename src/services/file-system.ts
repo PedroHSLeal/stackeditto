@@ -1,32 +1,47 @@
 import type { CustomFile } from "@/models/file";
-import type { Ref } from "vue";
 
-export function useFileSystem(directory: Ref<CustomFile[]>) {
+export function useFileSystem() {
   let directoryStructure: Promise<CustomFile[] | undefined>;
   let originalHandle: FileSystemHandle;
 
   async function populateDirectory() {
     const filesInDirectory = await openDirectory();
+    const directory = [];
+    const applicationDirectory = [];
 
     if (!filesInDirectory) {
       return;
     }
 
-    directory.value = filesInDirectory.filter((f) => {
-      return !f.webkitRelativePath.includes("/.");
-    });
+    directory.push(
+      ...filesInDirectory.filter((f) => {
+        return !f.webkitRelativePath.includes("/.");
+      })
+    );
+
+    applicationDirectory.push(...filesInDirectory.filter((f) => f.webkitRelativePath.includes("/.stackeditto")));
+
+    return { directory, applicationDirectory };
   }
 
   async function repopulateDirectory() {
     const filesInDirectory = await getFiles(originalHandle);
+    const directory = [];
+    const applicationDirectory = [];
 
     if (!filesInDirectory) {
       return;
     }
 
-    directory.value = filesInDirectory.filter((f) => {
-      return !f.webkitRelativePath.includes("/.");
-    });
+    directory.push(
+      ...filesInDirectory.filter((f) => {
+        return !f.webkitRelativePath.includes("/.");
+      })
+    );
+
+    applicationDirectory.push(...filesInDirectory.filter((f) => f.webkitRelativePath.includes("/.stackeditto")));
+
+    return { directory, applicationDirectory };
   }
 
   async function getFiles(dirHandle: FileSystemHandle, path = dirHandle.name): Promise<CustomFile[] | undefined> {
@@ -40,7 +55,7 @@ export function useFileSystem(directory: Ref<CustomFile[]>) {
           (entry as FileSystemFileHandle).getFile().then((file) => {
             file.directoryHandle = dirHandle;
             file.handle = entry;
-            file.extensionFile = (file as File).name.substring((file as File).name.lastIndexOf(".") + 1, (file as File).name.length);
+            file.extensionFile = file.name.substring(file.name.lastIndexOf(".") + 1, file.name.length);
 
             return Object.defineProperty(file, "webkitRelativePath", {
               configurable: true,
@@ -73,16 +88,16 @@ export function useFileSystem(directory: Ref<CustomFile[]>) {
 
   async function verifyPermission(fileHandle: FileSystemFileHandle, readWrite: boolean) {
     const options = { mode: "read" };
-    
+
     if (readWrite) {
-      options.mode = 'readwrite';
+      options.mode = "readwrite";
     }
     // Check if permission was already granted. If so, return true.
-    if ((await fileHandle.queryPermission(options)) === 'granted') {
+    if ((await fileHandle.queryPermission(options)) === "granted") {
       return true;
     }
     // Request permission. If the user grants permission, return true.
-    if ((await fileHandle.requestPermission(options)) === 'granted') {
+    if ((await fileHandle.requestPermission(options)) === "granted") {
       return true;
     }
     // The user didn't grant permission, so return false.

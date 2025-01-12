@@ -3,7 +3,6 @@
 </template>
 
 <script setup lang="ts">
-import type { CustomFile } from '@/models/file';
 import { marked } from 'marked';
 import { onMounted, onUpdated, ref } from 'vue';
 
@@ -24,5 +23,6 @@ function insertHTML() {
 #preview {
   height: 100vh;
   overflow: auto;
+  padding: 8px;
 }
 </style>
