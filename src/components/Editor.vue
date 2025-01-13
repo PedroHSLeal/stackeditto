@@ -58,7 +58,12 @@ onMounted(async () => {
   }
 
   editor.getModel()?.onDidChangeContent(() => {
-    emits("change", editor.getModel()?.getValue() ?? "");
+    const content = editor.getModel()?.getValue();
+
+    console.log(content?.length, props.fileContent.length);
+
+    if (props.fileContent !== content)
+      emits("change", content ?? "");
   })
 });
 

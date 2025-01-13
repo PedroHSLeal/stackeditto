@@ -13,7 +13,6 @@
 </template>
 
 <script setup lang="ts">
-
 import { onMounted, ref } from 'vue';
 
 import Files from './components/Files.vue';
@@ -48,6 +47,8 @@ async function populateDirectory() {
 
   directory.value = result?.directory;
   applicationDirectory.value = result?.applicationDirectory;
+
+  await loadScripts();
 }
 
 async function saveAndReload() {
@@ -78,12 +79,29 @@ async function selectFile(file: CustomFile) {
   fileContent.value = await file.text();
   fileTempContent.value = await file.text();
   fileExtension.value = file.name.split(".")[1];
-
+  
   selectedFile.value = await file.directoryHandle.getFileHandle(file.name)
 }
 
 async function reloadPreview(tempContent: string) {
   fileTempContent.value = tempContent;
+}
+
+async function loadScripts() {
+  const loadImports = applicationDirectory.value.find(f => f.name == "imports.js");
+
+  if (loadImports) {
+    window.loadImports = new Function(await loadImports.text());
+    await window.loadImports();
+  }
+
+  const scriptsContent = applicationDirectory.value
+    .filter(f => f.name !== "imports.js")
+    .map(async (f) => [f.name.split(".")[0], await f.text()]);
+
+  scriptsContent.forEach(async (script) => {
+    script.then((s) => window[s[0]] = new Function(s[1]));
+  });
 }
 
 </script>
