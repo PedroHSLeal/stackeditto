@@ -19,11 +19,12 @@ import Files from './components/Files.vue';
 import Topbar from './components/Topbar.vue';
 import Editor from './components/Editor.vue';
 import Preview from './components/Preview.vue';
+import ExtensionModal from './components/modals/ExtensionModal.vue';
 
 import type { CustomFile } from './models/file';
 
 import { useFileSystem } from './services/file-system';
-import ExtensionModal from './components/modals/ExtensionModal.vue';
+import { useExtensions } from './services/extension';
 
 const selectedFile = ref<FileSystemFileHandle>();
 
@@ -37,71 +38,47 @@ const fileExtension = ref<string>("");
 const showExtensionModal = ref<boolean>(false);
 
 const fs = useFileSystem();
+const { loadScripts } = useExtensions();
 
 onMounted(() => { });
 
 async function populateDirectory() {
-  const result = await fs.populateDirectory();
-
-  if (!result) return;
-
-  directory.value = result?.directory;
-  applicationDirectory.value = result?.applicationDirectory;
-
-  await loadScripts();
+  await changeRefs(await fs.populateDirectory());
+  await loadScripts(applicationDirectory);
 }
 
 async function saveAndReload() {
   if (!selectedFile.value) return;
 
   await fs.saveFile(selectedFile.value, fileTempContent.value)
-
-  const result = await fs.repopulateDirectory();
-
-  if (!result) return;
-
-  directory.value = result?.directory;
-  applicationDirectory.value = result?.applicationDirectory;
+  await changeRefs(await fs.repopulateDirectory());
 }
 
 async function closeModalAndReload() {
   showExtensionModal.value = false;
 
-  const result = await fs.repopulateDirectory();
-
-  if (!result) return;
-
-  directory.value = result?.directory;
-  applicationDirectory.value = result?.applicationDirectory;
+  await changeRefs(await fs.populateDirectory());
 }
 
 async function selectFile(file: CustomFile) {
   fileContent.value = await file.text();
   fileTempContent.value = await file.text();
-  fileExtension.value = file.name.split(".")[1];
+  fileExtension.value = file.extensionFile;
   
-  selectedFile.value = await file.directoryHandle.getFileHandle(file.name)
+  selectedFile.value = await file.directoryHandle.getFileHandle(file.name);
 }
 
 async function reloadPreview(tempContent: string) {
   fileTempContent.value = tempContent;
 }
 
-async function loadScripts() {
-  const loadImports = applicationDirectory.value.find(f => f.name == "imports.js");
+async function changeRefs(directoryResult: Awaited<ReturnType<typeof fs.populateDirectory> | ReturnType<typeof fs.repopulateDirectory>>) {
+  if (!directoryResult) return;
 
-  if (loadImports) {
-    window.loadImports = new Function(await loadImports.text());
-    await window.loadImports();
-  }
+  const { directory: fsDirectory, applicationDirectory: fsApplicationDirectory } = directoryResult;
 
-  const scriptsContent = applicationDirectory.value
-    .filter(f => f.name !== "imports.js")
-    .map(async (f) => [f.name.split(".")[0], await f.text()]);
-
-  scriptsContent.forEach(async (script) => {
-    script.then((s) => window[s[0]] = new Function(s[1]));
-  });
+  directory.value = fsDirectory;
+  applicationDirectory.value = fsApplicationDirectory;
 }
 
 </script>

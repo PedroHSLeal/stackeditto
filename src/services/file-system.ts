@@ -1,31 +1,20 @@
 import type { CustomFile } from "@/models/file";
 
+export type DirectoryStructure = { directory: CustomFile[], applicationDirectory: CustomFile[] }
+
 export function useFileSystem() {
   let directoryStructure: Promise<CustomFile[] | undefined>;
   let originalHandle: FileSystemHandle;
 
   async function populateDirectory() {
-    const filesInDirectory = await openDirectory();
-    const directory = [];
-    const applicationDirectory = [];
-
-    if (!filesInDirectory) {
-      return;
-    }
-
-    directory.push(
-      ...filesInDirectory.filter((f) => {
-        return !f.webkitRelativePath.includes("/.");
-      })
-    );
-
-    applicationDirectory.push(...filesInDirectory.filter((f) => f.webkitRelativePath.includes("/.stackeditto")));
-
-    return { directory, applicationDirectory };
+    return basePopulateDirectory(await openDirectory())
   }
 
   async function repopulateDirectory() {
-    const filesInDirectory = await getFiles(originalHandle);
+    return basePopulateDirectory(await getFiles(originalHandle));
+  }
+
+  async function basePopulateDirectory(filesInDirectory: CustomFile[] | undefined) {
     const directory = [];
     const applicationDirectory = [];
 
@@ -44,23 +33,36 @@ export function useFileSystem() {
     return { directory, applicationDirectory };
   }
 
-  async function getFiles(dirHandle: FileSystemHandle, path = dirHandle.name): Promise<CustomFile[] | undefined> {
+  async function getFiles(dirHandle: FileSystemHandle, path = dirHandle.name): Promise<CustomFile[]> {
     const dirs = [];
     const files = [];
 
-    for await (const entry of dirHandle.values() as Iterable<FileSystemHandle>) {
+    for await (const entry of dirHandle.values()) {
       const nestedPath = `${path}/${entry.name}`;
       if (entry.kind === "file") {
         files.push(
-          (entry as FileSystemFileHandle).getFile().then((file) => {
-            file.directoryHandle = dirHandle;
-            file.handle = entry;
-            file.extensionFile = file.name.substring(file.name.lastIndexOf(".") + 1, file.name.length);
-
-            return Object.defineProperty(file, "webkitRelativePath", {
-              configurable: true,
-              enumerable: true,
-              get: () => nestedPath,
+          entry.getFile().then((file: any) => {
+            return Object.defineProperties<CustomFile>(file, {
+              directoryHandle: {
+                configurable: true,
+                enumerable: true,
+                get: () => dirHandle,
+              },
+              handle: {
+                configurable: true,
+                enumerable: true,
+                get: () => entry
+              },
+              extensionFile: {
+                configurable: true,
+                enumerable: true,
+                get: () => file.name.substring(file.name.lastIndexOf(".") + 1, file.name.length)
+              },
+              webkitRelativePath: {
+                configurable: true,
+                enumerable: true,
+                get: () => nestedPath,
+              },
             });
           })
         );
@@ -86,24 +88,6 @@ export function useFileSystem() {
     return directoryStructure;
   }
 
-  async function verifyPermission(fileHandle: FileSystemFileHandle, readWrite: boolean) {
-    const options = { mode: "read" };
-
-    if (readWrite) {
-      options.mode = "readwrite";
-    }
-    // Check if permission was already granted. If so, return true.
-    if ((await fileHandle.queryPermission(options)) === "granted") {
-      return true;
-    }
-    // Request permission. If the user grants permission, return true.
-    if ((await fileHandle.requestPermission(options)) === "granted") {
-      return true;
-    }
-    // The user didn't grant permission, so return false.
-    return false;
-  }
-
   async function saveFile(fileHandle: FileSystemFileHandle, fileContent: string) {
     if (!fileHandle) return;
 
@@ -115,7 +99,6 @@ export function useFileSystem() {
   return {
     populateDirectory,
     repopulateDirectory,
-    verifyPermission,
     saveFile,
   };
 }

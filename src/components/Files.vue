@@ -2,13 +2,14 @@
   <div id="files" class="container">
     <div id="files-list">
       <p v-for="file in directory" @click="selectFile(file)">
-        {{ file.name }}
+        <Icon icon="material-symbols:lab-profile-rounded"/> {{ file.name }}
       </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { Icon } from "@iconify/vue";
 import type { CustomFile } from '@/models/file';
 import { onMounted } from 'vue';
 
