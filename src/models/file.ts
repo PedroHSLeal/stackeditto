@@ -3,4 +3,11 @@ export type CustomFile = File & {
   handle: FileSystemFileHandle;
   webkitRelativePath: string;
   extensionFile: string;
+
 };
+
+export type CustomDirectory = {
+  directoryName: string;
+  files: CustomFile[];
+  directories: CustomDirectory[];
+}

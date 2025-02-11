@@ -43,42 +43,45 @@ const { loadScripts } = useExtensions();
 onMounted(() => { });
 
 async function populateDirectory() {
-  await changeRefs(await fs.populateDirectory());
-  await loadScripts(applicationDirectory);
+  await fs.openDirectory();
+  // console.log(await fs.populateDirectory(fs.directoryStructure.value));
+  /* await changeRefs(await fs.populateDirectory(fs.directoryStructure.value)); */
+  /* await loadScripts(applicationDirectory); */
 }
 
 async function saveAndReload() {
-  if (!selectedFile.value) return;
+  /* if (!selectedFile.value) return;
 
-  await fs.saveFile(selectedFile.value, fileTempContent.value)
-  await changeRefs(await fs.repopulateDirectory());
+  await fs.saveFile(selectedFile.value, fileTempContent.value);
+  await fs.reopenDirectory();
+  await changeRefs(await fs.repopulateDirectory(fs.directoryStructure.value)); */
 }
 
 async function closeModalAndReload() {
-  showExtensionModal.value = false;
+  /* showExtensionModal.value = false;
 
-  await changeRefs(await fs.populateDirectory());
+  await changeRefs(await fs.populateDirectory(fs.directoryStructure.value)); */
 }
 
 async function selectFile(file: CustomFile) {
-  fileContent.value = await file.text();
+  /* fileContent.value = await file.text();
   fileTempContent.value = await file.text();
   fileExtension.value = file.extensionFile;
   
-  selectedFile.value = await file.directoryHandle.getFileHandle(file.name);
+  selectedFile.value = await file.directoryHandle.getFileHandle(file.name); */
 }
 
 async function reloadPreview(tempContent: string) {
-  fileTempContent.value = tempContent;
+  /* fileTempContent.value = tempContent; */
 }
 
 async function changeRefs(directoryResult: Awaited<ReturnType<typeof fs.populateDirectory> | ReturnType<typeof fs.repopulateDirectory>>) {
-  if (!directoryResult) return;
+  /* if (!directoryResult) return;
 
   const { directory: fsDirectory, applicationDirectory: fsApplicationDirectory } = directoryResult;
 
   directory.value = fsDirectory;
-  applicationDirectory.value = fsApplicationDirectory;
+  applicationDirectory.value = fsApplicationDirectory; */
 }
 
 </script>
