@@ -1,12 +1,12 @@
 import type { CustomDirectory, CustomFile } from "@/models/file";
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 
 export type DirectoryStructure = { directory: CustomFile[]; applicationDirectory: CustomFile[] };
 
 export function useFileSystem() {
   const directoryStructure = ref<CustomDirectory>();
   const originalHandle = ref<FileSystemHandle>();
-  const excludeDirectories = [".git", ".stackeditto", ".obsidian"];
+  const excludeDirectories = [".git", ".obsidian"];
 
   async function populateDirectory(structure: typeof directoryStructure.value) {
     return basePopulateDirectory(structure);
@@ -17,24 +17,14 @@ export function useFileSystem() {
   }
 
   async function basePopulateDirectory(filesInDirectory: CustomDirectory | undefined) {
-    const directory = [];
-    const applicationDirectory = [];
-
     if (!filesInDirectory) {
-      return;
+      return { directory: { directoryName: "", files: [], directories: [] }, applicationDirectory: { directoryName: "", files: [], directories: [] } };
     }
 
-    directory.push(filesInDirectory);
+    const stackeditoDirectoryIndex = filesInDirectory.directories.findIndex((d) => d.directoryName == ".stackeditto");
+    const appDirectory = stackeditoDirectoryIndex < 0 ? { directoryName: "", files: [], directories: [] } : filesInDirectory.directories.splice(stackeditoDirectoryIndex, 1)[0];
 
-    /* directory.push(
-      ...filesInDirectory.directories.filter((f) => {
-        return !f.directoryName.includes(".git") || !f.directoryName.includes(".obsidian");
-      })
-    ); */
-
-    /* applicationDirectory.push(...filesInDirectory.directories.filter((f) => f.directoryName.includes(".stackeditto"))); */
-
-    return { directory, applicationDirectory };
+    return { directory: filesInDirectory, applicationDirectory: appDirectory };
   }
 
   async function getFiles(dirHandle: FileSystemHandle, tree: CustomDirectory, path = dirHandle.name): Promise<CustomDirectory> {
@@ -77,7 +67,8 @@ export function useFileSystem() {
         newTree.directories = leaf.directories;
         newTree.files = leaf.files;
 
-        if (newTree.files.length > 0) dirs.push(newTree);
+        /* if (newTree.files.length > 0) dirs.push(newTree); */
+        dirs.push(newTree);
       }
     }
 
@@ -91,8 +82,6 @@ export function useFileSystem() {
     try {
       originalHandle.value = await showDirectoryPicker({ mode: "readwrite" });
       directoryStructure.value = await getFiles(originalHandle.value, { directoryName: originalHandle.value.name, directories: [], files: [] });
-
-      console.log(directoryStructure.value);
     } catch (err: any) {
       if (err.name !== "AbortError") {
         console.error(err.name, err.message);

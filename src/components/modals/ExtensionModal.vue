@@ -12,10 +12,10 @@
 
 <script setup lang="ts">
 import Modal from '../Modal.vue';
-import Files from '../Files.vue';
+import Files from '../Workspace.vue';
 import Editor from '../Editor.vue';
 import Topbar from '../Topbar.vue';
-import type { CustomFile } from '@/models/file';
+import type { CustomDirectory, CustomFile } from '@/models/file';
 import { ref } from 'vue';
 import { useFileSystem } from '@/services/file-system';
 
@@ -23,7 +23,7 @@ const selectedFile = ref<FileSystemFileHandle>();
 const fileContent = ref<string>("");
 const fileTempContent = ref<string>("");
 
-const props = defineProps<{ extensionFolder: CustomFile[] }>();
+const props = defineProps<{ extensionFolder: CustomDirectory }>();
 const emits = defineEmits<{ (e: "close"): void }>();
 
 const fs = useFileSystem();
