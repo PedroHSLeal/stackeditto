@@ -31,6 +31,7 @@ Na versão v0.1, este projeto consiste em testar um pouco as capacidades de
 
 # ideias a serem implementadas na versao v0.2
 
+[] adicao de novos arquivos
 [] melhoria das interfaces
 [] refatoracao da estrutura de extensões
 [] testes de componentes
