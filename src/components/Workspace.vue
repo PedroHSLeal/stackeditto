@@ -4,11 +4,13 @@
       <span id="directory" @click="showContent[index] = !showContent[index]">
         <Icon :icon="showContent[index] ? 'material-symbols:folder-open' : 'material-symbols:folder'" /> {{ dir.directoryName }}
       </span>
-      <div v-if="showContent[index]" style="width: max-content; display: flex; flex-direction: column; padding-left: 8px">
-        <span v-for="file in dir.files" id="file" @click="selectFile(file)">
-          <Icon icon="material-symbols:lab-profile-rounded" /> {{ file.name }}
-        </span>
-        <Workspace @onSelect="selectFile" :directory="dir" />
+      <div style="display: flex; flex-direction: row;">
+        <div v-if="showContent[index]" style="flex: 1; display: flex; flex-direction: column; padding-left: 8px">
+          <span v-for="file in dir.files" id="file" @click="selectFile(file)">
+            <Icon icon="material-symbols:lab-profile-rounded" /> {{ file.name }}
+          </span>
+          <Workspace @onSelect="selectFile" :directory="dir" />
+        </div>
       </div>
     </template>
   </div>
