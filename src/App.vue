@@ -1,121 +1,339 @@
 <template>
   <div id="app-container">
-    <Topbar>
-      <button @click="populateDirectory">Abrir</button>
-      <button v-if="fileTempContent" @click="saveAndReload">Salvar</button>
-      <button v-if="applicationDirectory.length > 0" @click="() => showExtensionModal = true">Extensoes</button>
+    <Topbar v-if="anyApplication" :style="{ height: `${TOPBAR_HEIGHT_IN_PIXELS}px` }" style="flex: 0 0 auto">
+      <button v-if="anyApplication" @click="showWorkspace = !showWorkspace" :style="{ backgroundColor: showWorkspace ? 'var(--terciary)' : '' }" style="display: inline-flex; align-items: center; justify-content: center">
+        <Icon width="16" height="16" icon="material-symbols:menu-rounded" />
+      </button>
+
+      <DropdownMenu>
+        <template #trigger-button="{ showModalFn, modal }">
+          <button @click="showModalFn" style="display: flex; gap: 4px; align-items: center; justify-content: center">
+            Projeto
+            <Icon width="16" height="16" :icon="modal ? 'material-symbols:arrow-drop-up-rounded' : 'material-symbols:arrow-drop-down-rounded'" />
+          </button>
+        </template>
+        <template #dropdown="{ showModalFn }">
+          <button v-if="!anyApplication" @click="() => { populateDirectory(); showModalFn() }">Abrir Workspace</button>
+          <button v-if="anyApplication" @click="() => { populateDirectory(false); showModalFn() }">Recarregar Workspace</button>
+          <button v-if="anyApplication" @click="() => { showNewResourceModal(ModalOperation.DIRECTORY, store.$state.directory!, false); showModalFn() }">Nova Pasta</button>
+          <button v-if="anyApplication" @click="() => { showNewResourceModal(ModalOperation.FILE, store.$state.directory!, false); showModalFn() }">Novo Arquivo</button>
+          <button v-if="anyApplication && !isMobile" @click="() => { showOrCreateExtension(); showModalFn() }">Extensoes</button>
+        </template>
+      </DropdownMenu>
+
+      <DropdownMenu v-if="anyApplication">
+        <template #trigger-button="{ showModalFn, modal }">
+          <button @click="showModalFn" style="display: flex; gap: 4px; align-items: center; justify-content: center">
+            Arquivo
+            <Icon width="16" height="16" :icon="modal ? 'material-symbols:arrow-drop-up-rounded' : 'material-symbols:arrow-drop-down-rounded'" />
+          </button>
+        </template>
+        <template #dropdown="{ showModalFn }">
+          <button @click="() => { saveFile(); showModalFn() }">Salvar Arquivo</button>
+        </template>
+      </DropdownMenu>
     </Topbar>
-    <Files @onSelect="selectFile" :directory="directory" />
-    <Editor v-if="fileContent && fileExtension" :fileContent="fileContent" :language="fileExtension" @change="reloadPreview" />
-    <Preview v-if="fileTempContent" :content="fileTempContent" />
-    <ExtensionModal v-if="showExtensionModal" :extensionFolder="applicationDirectory" @close="closeModalAndReload" />
+
+    <div id="widgets" :style="{ height: `calc(100vh - ${TOPBAR_HEIGHT_IN_PIXELS}px)` }" style="display: flex">
+      <Workspace v-if="showWorkspace" @onSelectDirectory="selectDirectory" @onSelectFile="openFile" @onSelectOpenedFile="reopenFile" @menuAction="triggerAction" :openedFiles="openedFiles" :workspaceData="store.$state.directory" :style="{ width: `${WORKSPACE_WIDTH_IN_PIXELS}px` }" style="flex-shrink: 0;" />
+      <Welcome v-if="!anyApplication" @action="() => populateDirectory(true)" style="flex-grow: 1" />
+      <ProsemirrorEditor v-if="anyApplication && fileKey" :fileKey="fileKey" />
+    </div>
+
+    <ExtensionModal v-if="showExtension && !isMobile" :extensionFolder="store.$state.configDirectory!" @onTriggerNewFileOrDirectoryModal="(op) => showNewResourceModal(op, store.$state.configDirectory!, false)" @onConfirm="reloadDirectoryStructure" @onClose="() => showExtension = false" />
+    <NewFileOrDirectoryModal v-if="showNewResource" :workspace="newResourceWorkspace!" :operation="newResourceOperation!" @onConfirm="saveNewFileOrDirectory" @onCancel="showNewResource = false" />
+    <RenameResourceModal v-if="showRenameResource" :resourceName="renameResourceName" :operation="renameResourceOperation!" @onConfirm="renameResource" @onCancel="() => showRenameResource = false" />
+    <DeleteResourceModal v-if="showDeleteResource" :operation="deleteResourceOperation!" @onConfirm="deleteResource" @onCancel="() => showDeleteResource = false" />
+
+    <Transition>
+      <LoadingModal v-if="showLoading" />
+    </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref, shallowRef } from 'vue';
 
-import Files from './components/Files.vue';
+import { Icon } from "@iconify/vue";
+import { useMediaQuery } from "@vueuse/core";
+
+import Workspace from './components/Workspace.vue';
 import Topbar from './components/Topbar.vue';
-import Editor from './components/Editor.vue';
-import Preview from './components/Preview.vue';
+import ExtensionModal from './components/modals/ExtensionModal.vue';
+import NewFileOrDirectoryModal from './components/modals/NewFileOrDirectoryModal.vue';
+import RenameResourceModal from './components/modals/RenameResourceModal.vue';
+import DeleteResourceModal from './components/modals/DeleteResourceModal.vue';
+import LoadingModal from './components/modals/LoadingModal.vue';
+import DropdownMenu from './components/DropdownMenu.vue';
+import ProsemirrorEditor from './components/ProsemirrorEditor.vue';
+import Welcome from './components/Welcome.vue';
 
-import type { CustomFile } from './models/file';
+import type { CustomDirectory, CustomFile } from './models/file';
+import { ModalOperation } from './models/file';
 
 import { useFileSystem } from './services/file-system';
-import ExtensionModal from './components/modals/ExtensionModal.vue';
 
-const selectedFile = ref<FileSystemFileHandle>();
+import { EXTENSION_STRUCTURE, useUntrustedScripts, getUntrustedHtmlBlock, getUntrustedHtmlBlockKeys, useUntrustedModules } from '@/services/untrusted-code-extensions';
 
-const directory = ref<CustomFile[]>([]);
-const applicationDirectory = ref<CustomFile[]>([]);
+import { useFileSystemStore } from './store/file-system';
+import { getView, getViewTextContent } from './services/prosemirror';
+import { useOpenFiles } from './services/opened-files';
+import { proseMirrorToMarkdown, type Value } from './services/markdown/remark';
 
-const fileContent = ref<string>("");
-const fileTempContent = ref<string>("");
-const fileExtension = ref<string>("");
+import type { MenuAction } from './models/workspace';
 
-const showExtensionModal = ref<boolean>(false);
-
+const of = useOpenFiles();
 const fs = useFileSystem();
+const { executeUntrustedScript } = useUntrustedScripts();
+const { registerUntrustedModules } = useUntrustedModules();
+const store = useFileSystemStore();
+const isMobile = useMediaQuery("(max-width: 560px)");
+
+const TOPBAR_HEIGHT_IN_PIXELS = 32;
+const WORKSPACE_WIDTH_IN_PIXELS = 350;
+
+const anyApplication = computed(() => store.$state.originalHandler != null);
+
+const selectedDirectory = shallowRef<CustomDirectory | null>(null);
+
+const fileKey = ref<string>("");
+
+const openedFiles = computed(() => of.getOpenedFiles().value);
+
+const showWorkspace = ref<boolean>(false);
+const showExtension = ref<boolean>(false);
+const showEditor = ref<boolean>(false);
+const showLoading = ref<boolean>(false);
+
+const showRenameResource = ref<boolean>(false);
+const renameResourceName = ref("");
+const renameResourceOperation = ref<ModalOperation | null>(null);
+
+const showDeleteResource = ref<boolean>(false);
+const deleteResourceOperation = ref<ModalOperation | null>(null);
+
+const showNewResource = ref<boolean>(false);
+const newResourceWorkspace = shallowRef<CustomDirectory | null>(null);
+const newResourceOperation = ref<ModalOperation | null>(null);
+
+let resourceActionData: CustomDirectory | CustomFile | null = null;
 
 onMounted(() => { });
 
-async function populateDirectory() {
-  const result = await fs.populateDirectory();
-
-  if (!result) return;
-
-  directory.value = result?.directory;
-  applicationDirectory.value = result?.applicationDirectory;
-
-  await loadScripts();
-}
-
-async function saveAndReload() {
-  if (!selectedFile.value) return;
-
-  await fs.saveFile(selectedFile.value, fileTempContent.value)
-
-  const result = await fs.repopulateDirectory();
-
-  if (!result) return;
-
-  directory.value = result?.directory;
-  applicationDirectory.value = result?.applicationDirectory;
-}
-
-async function closeModalAndReload() {
-  showExtensionModal.value = false;
-
-  const result = await fs.repopulateDirectory();
-
-  if (!result) return;
-
-  directory.value = result?.directory;
-  applicationDirectory.value = result?.applicationDirectory;
-}
-
-async function selectFile(file: CustomFile) {
-  fileContent.value = await file.text();
-  fileTempContent.value = await file.text();
-  fileExtension.value = file.name.split(".")[1];
-  
-  selectedFile.value = await file.directoryHandle.getFileHandle(file.name)
-}
-
-async function reloadPreview(tempContent: string) {
-  fileTempContent.value = tempContent;
-}
-
-async function loadScripts() {
-  const loadImports = applicationDirectory.value.find(f => f.name == "imports.js");
-
-  if (loadImports) {
-    window.loadImports = new Function(await loadImports.text());
-    await window.loadImports();
+async function populateDirectory(openDirectoryPicker = true) {
+  if (openDirectoryPicker) {
+    store.$patch({ originalHandler: await fs.openDirectory() });
   }
 
-  const scriptsContent = applicationDirectory.value
-    .filter(f => f.name !== "imports.js")
-    .map(async (f) => [f.name.split(".")[0], await f.text()]);
+  const directoryStructure = await fs.buildDirectoryStructure(store.$state.originalHandler!);
+  const project = fs.populateDirectory(directoryStructure);
 
-  scriptsContent.forEach(async (script) => {
-    script.then((s) => window[s[0]] = new Function(s[1]));
+  if (!project) return;
+
+  store.$patch({
+    directory: project.directory,
+    configDirectory: project.applicationDirectory
   });
+
+  if (project.applicationDirectory)
+    await executeUntrustedScripts();
+
+  showWorkspace.value = true;
+  showEditor.value = true;
+}
+
+async function executeUntrustedScripts() {
+  let userUntrustedFiles = fs.getAllFilesFromDirectory(store.$state.configDirectory!);
+
+  let userUntrustedModules = userUntrustedFiles.filter(file => file.name.endsWith(".mjs"))
+    .map(({ text, webkitRelativePath }) => ({ text: text, webkitRelativePath }));
+
+  let userUntrustedScripts = userUntrustedFiles.filter(file => file.name.endsWith(".js"))
+    .filter(f => f.size > 0)
+    .map(file => file.text());
+
+  await executeUntrustedScript(userUntrustedScripts);
+  await registerUntrustedModules(userUntrustedModules);
+}
+
+async function saveFile() {
+  fs.saveFile(of.getLastOpenedFile()!.handler, await getViewTextContent());
+}
+
+async function reloadDirectoryStructure() {
+  await populateDirectory(false);
+}
+
+async function showOrCreateExtension() {
+  if (!store.$state.configDirectory) {
+    const configDirectory = await fs.createNewDirectory(store.$state.originalHandler!, EXTENSION_STRUCTURE.EXTENSION_FOLDER);
+    await fs.createNewFile(configDirectory, EXTENSION_STRUCTURE.INDEX__JS.fileName, EXTENSION_STRUCTURE.INDEX__JS.content);
+    await populateDirectory(false);
+  }
+
+  showExtension.value = true;
+}
+
+async function showNewResourceModal(operation: ModalOperation, defaultDir: CustomDirectory, isChosenDir: boolean) {
+  newResourceWorkspace.value = isChosenDir ? selectedDirectory.value : defaultDir;
+  newResourceOperation.value = operation;
+  showNewResource.value = true;
+}
+
+async function showRenameResourceModal(operation: ModalOperation, priorResourceName: string) {
+  renameResourceName.value = priorResourceName;
+  renameResourceOperation.value = operation;
+  showRenameResource.value = true;
+}
+
+async function showDeleteResourceModal(operation: ModalOperation) {
+  deleteResourceOperation.value = operation;
+  showDeleteResource.value = true;
+}
+
+async function selectDirectory(directory: CustomDirectory) {
+  if (isMobile.value) {
+    showWorkspace.value = false;
+  }
+
+  selectedDirectory.value = directory;
+}
+
+async function saveTemporaryChangesInFile(fileHandle: FileSystemFileHandle, fileRelativePath: string, contentToSave: Value) {
+  of.setLastOpenedFile(fileHandle, contentToSave);
+  of.setFile(fileRelativePath, fileHandle, contentToSave);
+}
+
+async function openFile(fileInWorkspace: CustomFile) {
+  if (isMobile.value) {
+    showWorkspace.value = false;
+  }
+
+  if (of.hasFile(fileInWorkspace.webkitRelativePath))
+    await saveTemporaryChangesInFile(of.getLastOpenedFile()!.handler, fileKey.value, await getViewTextContent());
+  else
+    await saveTemporaryChangesInFile(fileInWorkspace.handle, fileInWorkspace.webkitRelativePath, await fileInWorkspace.text());
+
+  fileKey.value = fileInWorkspace.webkitRelativePath;
+}
+
+async function reopenFile(openedFileRelativePath: string) {
+  if (isMobile.value) {
+    showWorkspace.value = false;
+  }
+
+  let viewTextContent = await getViewTextContent();
+
+  of.updateFile(fileKey.value, viewTextContent);
+
+  fileKey.value = openedFileRelativePath;
+}
+
+async function triggerAction(type: MenuAction, resource: CustomDirectory | CustomFile) {
+  switch (type) {
+    case 'newFile':
+      showNewResourceModal(ModalOperation.FILE, (resource as CustomDirectory), false);
+      break;
+    case 'newDirectory':
+      showNewResourceModal(ModalOperation.DIRECTORY, (resource as CustomDirectory), false);
+      break;
+    case 'renameFile':
+      showRenameResourceModal(ModalOperation.FILE, resource.handle.name);
+      break;
+    case 'renameDirectory':
+      showRenameResourceModal(ModalOperation.DIRECTORY, resource.handle.name);
+      break;
+    case 'deleteFile':
+      showDeleteResourceModal(ModalOperation.FILE);
+      break;
+    case 'deleteDirectory':
+      showDeleteResourceModal(ModalOperation.DIRECTORY);
+      break;
+    default:
+      break;
+  }
+
+  resourceActionData = resource;
+}
+
+async function saveNewFileOrDirectory(directory: CustomDirectory, operation: ModalOperation, name: string) {
+  if (!directory.handle) return;
+
+  if (operation == ModalOperation.FILE) await fs.createNewFile(directory.handle, name, "");
+  else if (operation == ModalOperation.DIRECTORY) await fs.createNewDirectory(directory.handle, name);
+
+  await populateDirectory(false);
+
+  showNewResource.value = false;
+
+  await reloadDirectoryStructure();
+}
+
+async function renameResource(operation: ModalOperation, newResourceName: string) {
+  if (resourceActionData?.handle.name == newResourceName) return;
+
+  if (resourceActionData) {
+    if (operation == ModalOperation.FILE) {
+      let fileHandle = of.hasFile(resourceActionData.webkitRelativePath)
+        ? of.getFile(resourceActionData.webkitRelativePath)!.handler
+        : (resourceActionData as CustomFile).handle;
+
+      await fs.renameFile((resourceActionData as CustomFile).directoryHandle, (resourceActionData as CustomFile).name, newResourceName, await (await fileHandle.getFile()).text());
+    }
+    else if (operation == ModalOperation.DIRECTORY) {
+      showLoading.value = true;
+
+      let parentResourceRelativePath = resourceActionData.webkitRelativePath.split("/").slice(0, -1);
+
+      let parentDirectory = parentResourceRelativePath.length == 1 && store.$state.directory?.webkitRelativePath == parentResourceRelativePath[0]
+        ? store.$state.directory
+        : fs.findDirectoryHandler(store.$state.directory!, parentResourceRelativePath.join("/"));
+
+      let oldDirectoryToDelete = fs.findDirectoryHandler(store.$state.directory!, resourceActionData.webkitRelativePath);
+
+      await fs.renameDirectory(parentDirectory!.handle, (resourceActionData as CustomDirectory).handle, newResourceName);
+
+      await reloadDirectoryStructure();
+
+      if (oldDirectoryToDelete)
+        await fs.deleteDirectory(parentDirectory!.handle, oldDirectoryToDelete.handle, true);
+
+      showLoading.value = false;
+    }
+  }
+
+  showRenameResource.value = false;
+
+  await reloadDirectoryStructure();
+}
+
+async function deleteResource(operation: ModalOperation) {
+  if (resourceActionData) {
+    if (operation == ModalOperation.FILE) {
+      await fs.deleteFile((resourceActionData as CustomFile).directoryHandle, (resourceActionData as CustomFile).name);
+
+      of.deleteFile(resourceActionData.webkitRelativePath);
+
+      if (fileKey.value == resourceActionData.webkitRelativePath) {
+        fileKey.value = "";
+      }
+    }
+    else if (operation == ModalOperation.DIRECTORY) {
+      await fs.deleteDirectory(store.$state.originalHandler!, (resourceActionData as CustomDirectory).handle, true);
+    }
+  }
+
+  showDeleteResource.value = false;
+
+  await reloadDirectoryStructure();
 }
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 #app-container {
-  display: grid;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  grid-template-rows: 24px 1fr;
-  grid-template-columns: 250px 800px 1fr;
-}
-
-#app-container>#topbar {
-  grid-column: 1 / 4;
 }
 </style>

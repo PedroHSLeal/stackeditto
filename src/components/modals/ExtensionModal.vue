@@ -1,30 +1,44 @@
 <template>
   <Modal>
-    <div style="display: grid; grid-template-columns: 20% 1fr; grid-template-rows: 24px 1fr; height: 700px; width: 900px; background-color: white" @click.prevent.stop="">
-      <Topbar>
+    <div ref="container" style="display: grid; grid-template-columns: 20% 1fr; grid-template-rows: 32px 1fr; height: 90%; width: 90%; background-color: white">
+      <Topbar style="height: 32px">
+        <button @click="emits('onTriggerNewFileOrDirectoryModal', ModalOperation.DIRECTORY)">Nova Pasta</button>
+        <button @click="emits('onTriggerNewFileOrDirectoryModal', ModalOperation.FILE)">Novo Arquivo</button>
         <button v-if="fileTempContent" @click="saveAndReload">Salvar</button>
+        <div style="margin-left: auto">
+          <button @click="emits('onClose')" style="display: flex; align-items: center; justify-content: center; gap: 4px">
+            <Icon width="14" height="14" icon="material-symbols:close-rounded" /> Fechar
+          </button>
+        </div>
       </Topbar>
-      <Files @onSelect="selectFile" :directory="extensionFolder" />
-      <Editor v-if="fileContent" :fileContent="fileContent" language="js" @change="(c) => fileTempContent = c" />
+      <TreeView @onSelectFile="selectFile" :directory="extensionFolder" style="margin: 4px" />
+      <MonacoEditor v-if="fileContent != null" :fileContent="fileContent" :size="{ width: seila, height: containerBoundingRect.height - 32 }" language="js" @change="(c) => fileTempContent = c" @save="saveAndReload" />
     </div>
   </Modal>
 </template>
 
 <script setup lang="ts">
 import Modal from '../Modal.vue';
-import Files from '../Files.vue';
-import Editor from '../Editor.vue';
+import TreeView from '../TreeView/TreeView.vue';
+import MonacoEditor from '../MonacoEditor.vue';
 import Topbar from '../Topbar.vue';
-import type { CustomFile } from '@/models/file';
-import { ref } from 'vue';
+import { ModalOperation, type CustomDirectory, type CustomFile } from '@/models/file';
+import { computed, reactive, ref } from 'vue';
 import { useFileSystem } from '@/services/file-system';
+import { useElementBounding } from '@vueuse/core';
+import { Icon } from '@iconify/vue/dist/iconify.js';
+
+const container = ref<HTMLElement>();
+const containerBoundingRect = reactive(useElementBounding(container));
+
+const seila = computed(() => containerBoundingRect.width - (containerBoundingRect.width * 0.2));
 
 const selectedFile = ref<FileSystemFileHandle>();
-const fileContent = ref<string>("");
-const fileTempContent = ref<string>("");
+const fileContent = ref<string | null>(null);
+const fileTempContent = ref<string | null>(null);
 
-const props = defineProps<{ extensionFolder: CustomFile[] }>();
-const emits = defineEmits<{ (e: "close"): void }>();
+const props = defineProps<{ extensionFolder: CustomDirectory }>();
+const emits = defineEmits<{ (e: "onClose"): void, (e: "onConfirm"): void, (e: 'onTriggerNewFileOrDirectoryModal', op: ModalOperation): void }>();
 
 const fs = useFileSystem();
 
@@ -35,11 +49,10 @@ async function selectFile(file: CustomFile) {
 
 async function saveAndReload() {
   if (!selectedFile.value) return;
-
-  await fs.saveFile(selectedFile.value, fileTempContent.value);
-
-  emits("close");
+  await fs.saveFile(selectedFile.value, fileTempContent.value ?? "");
+  emits("onConfirm");
 }
+
 </script>
 
 <style scoped>

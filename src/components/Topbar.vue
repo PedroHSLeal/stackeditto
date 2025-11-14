@@ -6,16 +6,12 @@
 
 <style scoped>
 #topbar {
-  background-color: lightblue;
-  height: 24px;
+  background-color: var(--primary);
+  height: 100%;
   display: flex;
   align-items: center;
   padding-left: 8px;
+  padding-right: 8px;
   gap: 10px;
-}
-
-#topbar> :slotted(button) {
-  padding: 0 3px;
-  border: 0;
 }
 </style>

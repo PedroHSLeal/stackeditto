@@ -1,0 +1,73 @@
+:root {
+  // <color name="Thistle" hex="cdb4db" r="205" g="180" b="219" />
+  --primary: #cdb4db;
+  // <color name="Fairy Tale" hex="ffc8dd" r="255" g="200" b="221" />
+  // <color name="Light Sky Blue" hex="a2d2ff" r="162" g="210" b="255" />
+  --secondary: #a2d2ff;
+  // <color name="Carnation pink" hex="ffafcc" r="255" g="175" b="204" />
+  // <color name="Uranian Blue" hex="bde0fe" r="189" g="224" b="254" />
+  --terciary: #bde0fe;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "JetBrains Mono", "Roboto", monospace;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body,
+#stackedit {
+  height: 100vh;
+  overflow: hidden;
+}
+
+button {
+  padding: 2px 6px;
+  border: 0;
+  border-radius: 4px;
+  min-height: 20px;
+  cursor: pointer;
+
+  &.primary {
+    transition: background-color 0.3s ease-in-out;
+    background-color: #cdb4db;
+
+    &:hover {
+      background-color: #ffafcc;
+    }
+  }
+
+  &.secondary {
+    transition: background-color 0.3s ease-in-out;
+    background-color: #a2d2ff;
+
+    &:hover {
+      background-color: #bde0fe;
+    }
+  }
+}
+
+.fancy-scroll {
+  &::-webkit-scrollbar {
+    width: 16px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: black;
+    border: 4px solid transparent;
+    background-clip: content-box;
+    border-radius: 12px;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}

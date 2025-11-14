@@ -1,0 +1,2 @@
+<infinite-canvas>
+</infinite-canvas>
