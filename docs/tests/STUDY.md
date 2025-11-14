@@ -1,0 +1,1 @@
+- que tipos de testes posso implementar?
