@@ -82,18 +82,22 @@ export function useFileSystem() {
     }
   }
 
-  async function createNewFile(directoryHandle: FileSystemDirectoryHandle, fileName: string, fileContent: string) {
+  async function createNewFile(directoryHandle: FileSystemDirectoryHandle, fileName: string | null | undefined, fileContent: FileSystemWriteChunkType) {
+    if (!fileName || fileName.trim() == "") return;
+
     const handle = await directoryHandle.getFileHandle(fileName, { create: true });
-    if (!handle) return;
 
     await saveFile(handle, fileContent);
+
+    return handle;
   }
 
-  async function createNewDirectory(directoryHandle: FileSystemDirectoryHandle, directoryName: string): Promise<FileSystemDirectoryHandle> {
-    return await directoryHandle.getDirectoryHandle(directoryName, { create: true });
+  async function createNewDirectory(parentDirectoryHandle: FileSystemDirectoryHandle, directoryName: string | null | undefined): Promise<FileSystemDirectoryHandle | undefined> {
+    if (!directoryName || directoryName.trim() == "") return Promise.resolve(undefined);
+    return await parentDirectoryHandle.getDirectoryHandle(directoryName, { create: true });
   }
 
-  async function saveFile(fileHandle: FileSystemFileHandle, fileContent: string) {
+  async function saveFile(fileHandle: FileSystemFileHandle, fileContent: FileSystemWriteChunkType) {
     if (!fileHandle) return;
 
     const writable = await fileHandle.createWritable();
@@ -101,15 +105,22 @@ export function useFileSystem() {
     await writable.close();
   }
 
-  function findDirectoryHandler(entryDirectory: CustomDirectory, directoryPath: string) {
-    let sliceDirectoryPath = directoryPath.split("/").slice(1);
+  function findDirectoryHandler(entryDirectory: CustomDirectory, directoryPath: string): CustomDirectory | undefined {
+    if (directoryPath.trim() == "") return;
 
-    if (sliceDirectoryPath.length == 1) {
-      return entryDirectory.directories.find(d => d.handle.name == sliceDirectoryPath[0]);
+    let splitedDirectoryPath = directoryPath.split("/");
+    if (splitedDirectoryPath[0] != entryDirectory.handle.name) return;
+
+    let slicedDirectoryPath = splitedDirectoryPath.slice(1);
+
+    if (slicedDirectoryPath.length == 1) {
+      return entryDirectory.directories.find(d => d.handle.name == slicedDirectoryPath[0]);
     }
-    else if (sliceDirectoryPath.length > 1) {
-      let parent = entryDirectory.directories.find(d => d.handle.name == sliceDirectoryPath[0]);
-      return findDirectoryHandler(parent!, sliceDirectoryPath.join("/"));
+    else if (slicedDirectoryPath.length > 1) {
+      let parent = entryDirectory.directories.find(d => d.handle.name == slicedDirectoryPath[0]);
+      return parent
+        ? findDirectoryHandler(parent!, slicedDirectoryPath.join("/"))
+        : undefined;
     }
   }
 
@@ -151,12 +162,14 @@ export function useFileSystem() {
   async function renameDirectory(parentDirectory: FileSystemDirectoryHandle, directoryToRename: FileSystemDirectoryHandle, newDirectoryName: string) {
     const newDirectory = await createNewDirectory(parentDirectory, newDirectoryName);
 
-    for await (const resource of directoryToRename.values()) {
-      if (resource.kind == "file") {
-        await createNewFile(newDirectory, resource.name, await (await resource.getFile()).text());
-      }
-      else if (resource.kind == "directory") {
-        await renameDirectory(newDirectory, resource, resource.name);
+    if (newDirectory) {
+      for await (const resource of directoryToRename.values()) {
+        if (resource.kind == "file") {
+          await createNewFile(newDirectory, resource.name, await (await resource.getFile()).text());
+        }
+        else if (resource.kind == "directory") {
+          await renameDirectory(newDirectory, resource, resource.name);
+        }
       }
     }
   }
