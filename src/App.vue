@@ -34,10 +34,10 @@
       </DropdownMenu>
     </Topbar>
 
-    <div id="widgets" :style="{ height: `calc(100vh - ${TOPBAR_HEIGHT_IN_PIXELS}px)` }" style="display: flex">
+    <div id="widgets" :style="{ height: `calc(100vh - ${TOPBAR_HEIGHT_IN_PIXELS}px)` }" style="flex-grow: 1; flex-shrink: 1; display: flex">
       <Workspace v-if="showWorkspace" @onSelectDirectory="selectDirectory" @onSelectFile="openFile" @onSelectOpenedFile="reopenFile" @menuAction="triggerAction" :openedFiles="openedFiles" :workspaceData="store.$state.directory" :style="{ width: `${WORKSPACE_WIDTH_IN_PIXELS}px` }" style="flex-shrink: 0;" />
       <Welcome v-if="!anyApplication" @action="() => populateDirectory(true)" style="flex-grow: 1" />
-      <ProsemirrorEditor v-if="anyApplication && fileKey" :fileKey="fileKey" />
+      <Editor v-if="anyApplication && fileValue" :value="fileValue" />
     </div>
 
     <ExtensionModal v-if="showExtension && !isMobile" :extensionFolder="store.$state.configDirectory!" @onTriggerNewFileOrDirectoryModal="(op) => showNewResourceModal(op, store.$state.configDirectory!, false)" @onConfirm="reloadDirectoryStructure" @onClose="() => showExtension = false" />
@@ -65,7 +65,7 @@ import RenameResourceModal from './components/modals/RenameResourceModal.vue';
 import DeleteResourceModal from './components/modals/DeleteResourceModal.vue';
 import LoadingModal from './components/modals/LoadingModal.vue';
 import DropdownMenu from './components/DropdownMenu.vue';
-import ProsemirrorEditor from './components/ProsemirrorEditor.vue';
+import Editor from './components/Editor.vue';
 import Welcome from './components/Welcome.vue';
 
 import type { CustomDirectory, CustomFile } from './models/file';
@@ -73,12 +73,12 @@ import { ModalOperation } from './models/file';
 
 import { useFileSystem } from './services/file-system';
 
-import { EXTENSION_STRUCTURE, useUntrustedScripts, getUntrustedHtmlBlock, getUntrustedHtmlBlockKeys, useUntrustedModules } from '@/services/untrusted-code-extensions';
+import { EXTENSION_STRUCTURE, useUntrustedScripts, useUntrustedModules } from '@/services/untrusted-code-extensions';
 
 import { useFileSystemStore } from './store/file-system';
-import { getView, getViewTextContent } from './services/prosemirror';
+import { getViewTextContent } from './services/prosemirror';
 import { useOpenFiles } from './services/opened-files';
-import { proseMirrorToMarkdown, type Value } from './services/markdown/remark';
+import { type Value } from './services/markdown/remark';
 
 import type { MenuAction } from './models/workspace';
 
@@ -96,7 +96,8 @@ const anyApplication = computed(() => store.$state.originalHandler != null);
 
 const selectedDirectory = shallowRef<CustomDirectory | null>(null);
 
-const fileKey = ref<string>("");
+const fileKey = shallowRef<string>("");
+const fileValue = shallowRef<CustomFile>();
 
 const openedFiles = computed(() => of.getOpenedFiles().value);
 
@@ -215,6 +216,7 @@ async function openFile(fileInWorkspace: CustomFile) {
     await saveTemporaryChangesInFile(fileInWorkspace.handle, fileInWorkspace.webkitRelativePath, await fileInWorkspace.text());
 
   fileKey.value = fileInWorkspace.webkitRelativePath;
+  fileValue.value = fileInWorkspace;
 }
 
 async function reopenFile(openedFileRelativePath: string) {
@@ -227,6 +229,10 @@ async function reopenFile(openedFileRelativePath: string) {
   of.updateFile(fileKey.value, viewTextContent);
 
   fileKey.value = openedFileRelativePath;
+
+  let customFile = fs.findFileHandler(store.$state.directory!, openedFileRelativePath);
+
+  fileValue.value = customFile;
 }
 
 async function triggerAction(type: MenuAction, resource: CustomDirectory | CustomFile) {
@@ -316,6 +322,7 @@ async function deleteResource(operation: ModalOperation) {
 
       if (fileKey.value == resourceActionData.webkitRelativePath) {
         fileKey.value = "";
+        fileValue.value = undefined;
       }
     }
     else if (operation == ModalOperation.DIRECTORY) {

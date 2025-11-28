@@ -12,7 +12,7 @@
         </div>
       </Topbar>
       <TreeView @onSelectFile="selectFile" :directory="extensionFolder" style="margin: 4px" />
-      <MonacoEditor v-if="fileContent != null" :fileContent="fileContent" :size="{ width: seila, height: containerBoundingRect.height - 32 }" language="js" @change="(c) => fileTempContent = c" @save="saveAndReload" />
+      <MonacoEditor v-if="fileContent != null" :value="fileContent" :size="{ width: editorSize.width, height: editorSize.height }" extension="js" @change="(c) => fileTempContent = c" @save="saveAndReload" />
     </div>
   </Modal>
 </template>
@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import Modal from '../Modal.vue';
 import TreeView from '../TreeView/TreeView.vue';
-import MonacoEditor from '../MonacoEditor.vue';
+import MonacoEditor from '../editors/monaco/Editor.vue';
 import Topbar from '../Topbar.vue';
 import { ModalOperation, type CustomDirectory, type CustomFile } from '@/models/file';
 import { computed, reactive, ref } from 'vue';
@@ -31,7 +31,7 @@ import { Icon } from '@iconify/vue/dist/iconify.js';
 const container = ref<HTMLElement>();
 const containerBoundingRect = reactive(useElementBounding(container));
 
-const seila = computed(() => containerBoundingRect.width - (containerBoundingRect.width * 0.2));
+const editorSize = computed(() => ({ width: containerBoundingRect.width - (containerBoundingRect.width * 0.2), height: containerBoundingRect.height - 32 }));
 
 const selectedFile = ref<FileSystemFileHandle>();
 const fileContent = ref<string | null>(null);

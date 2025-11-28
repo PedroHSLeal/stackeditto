@@ -6,6 +6,7 @@
 
 <style scoped>
 #modal {
+  z-index: 999;
   position: absolute;
   height: 100vh;
   width: 100vw;

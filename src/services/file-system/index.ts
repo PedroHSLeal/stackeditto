@@ -101,7 +101,7 @@ export function useFileSystem() {
     await writable.close();
   }
 
-  function findDirectoryHandler(entryDirectory: CustomDirectory, directoryPath: string) {
+  function findDirectoryHandler(entryDirectory: CustomDirectory, directoryPath: string): CustomDirectory | undefined {
     let sliceDirectoryPath = directoryPath.split("/").slice(1);
 
     if (sliceDirectoryPath.length == 1) {
@@ -110,6 +110,18 @@ export function useFileSystem() {
     else if (sliceDirectoryPath.length > 1) {
       let parent = entryDirectory.directories.find(d => d.handle.name == sliceDirectoryPath[0]);
       return findDirectoryHandler(parent!, sliceDirectoryPath.join("/"));
+    }
+  }
+
+  function findFileHandler(entryDirectory: CustomDirectory, filePath: string): CustomFile | undefined {
+    let sliceFilePath = filePath.split("/").slice(1);
+
+    if (sliceFilePath.length == 1) {
+      return entryDirectory.files.find(d => d.handle.name == sliceFilePath[0]);
+    }
+    else if (sliceFilePath.length > 1) {
+      let parent = entryDirectory.directories.find(d => d.handle.name == sliceFilePath[0]);
+      return findFileHandler(parent!, sliceFilePath.join("/"));
     }
   }
 
@@ -191,6 +203,7 @@ export function useFileSystem() {
     renameFile,
     renameDirectory,
 
+    findFileHandler,
     findDirectoryHandler,
     calcuteCountOfFilesAndDirectories
   };
