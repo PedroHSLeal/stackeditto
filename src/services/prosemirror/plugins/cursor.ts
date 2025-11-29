@@ -31,7 +31,6 @@ function styleTextNodes(tr: Transaction, nodeType: string): DecorationSet {
     let isCursorInDesiredElement = node === n && node.type.name == nodeType;
 
     if (isCursorInDesiredElement) {
-      console.log(`estou no ${nodeType}`, offset, i);
       headerDecorations.push(Decoration.widget(offset + 1, (view, getPos) => {
         let hashes = document.createElement("span");
         hashes.innerText = "#".repeat(headingLevel) + " ";

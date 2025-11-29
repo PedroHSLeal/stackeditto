@@ -141,7 +141,7 @@ export async function proseMirrorToMarkdown(doc: Node) {
       paragraph: fromPmNode("paragraph"),
       horizontal_rule: fromPmNode("thematicBreak"),
       blockquote: fromPmNode("blockquote"),
-      code_block: fromPmNode("code", (node) => { console.log(node); return { lang: node.attrs.language, value: node.textContent } }),
+      code_block: fromPmNode("code", (node) => { return { lang: node.attrs.language, value: node.textContent } }),
 
       list_item: fromPmNode("listItem"),
       ordered_list: fromPmNode("list", (node) => ({

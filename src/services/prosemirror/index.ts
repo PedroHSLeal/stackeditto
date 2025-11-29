@@ -13,7 +13,6 @@ import { getSingletonHighlighter } from 'shiki';
 import { buildInputRules } from "./input-rules";
 import { buildKeymap } from "./keymaps";
 import { specification } from "./schema";
-import { codeBlockKeymaps, CodeBlockView } from "./node-views/code";
 import { HtmlBlockView } from "./node-views/html-block";
 import { markdownToProseMirror, proseMirrorToMarkdown, type Value } from "../markdown/remark";
 import { getUntrustedHtmlBlock } from "../untrusted-code-extensions";
@@ -53,7 +52,6 @@ export async function buildViewState(content: Value) {
       keymap(baseKeymap),
 
       keymap(buildKeymap(mySchema)),
-      keymap(codeBlockKeymaps),
 
       dropCursor(),
       gapCursor(),
