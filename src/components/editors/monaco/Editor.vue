@@ -21,78 +21,78 @@ const fileFormatMap = new Map<string, string>([
 ]);
 
 const props = defineProps<{ value: string, extension: string, size?: { width: number, height: number } }>();
-const emits = defineEmits<{ (e: "change", fileTempContent: string): void, (e: "save"): void }>();
+const emits = defineEmits<{ (e: "change", changedValue: string): void, (e: "save"): void }>();
 
 const refEditor = useTemplateRef("refEditor");
 const refEditorContainer = useTemplateRef("refEditorContainer");
 
-onMounted(async () => {
-  console.log(props);
+onMounted(() => {
+  stopPropagationEventsInContainer();
 
-  if (refEditor.value && props.extension) {
-    monacoEditor.editor.defineTheme("ire", {
-      base: "vs",
-      inherit: true,
-      rules: [],
-      colors: {},
-    });
+  if (refEditor.value) {
+    createMonacoEditor(refEditor.value);
+    addJavascriptConfiguration();
 
-    monacoEditor.editor.setTheme("ire");
-
-    monacoEditor.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-      noSemanticValidation: true,
-      noSyntaxValidation: false,
-      onlyVisible: false,
-    });
-
-    monacoEditor.languages.typescript.javascriptDefaults.setCompilerOptions({
-      target: monacoEditor.languages.typescript.ScriptTarget.Latest,
-      allowNonTsExtensions: true,
-      allowJs: true,
-      jsx: monacoEditor.languages.typescript.JsxEmit.ReactJSX,
-    });
-
-    let libUri = "ts:filename/untrusted-code.d.ts";
-    let monacoUri = monacoEditor.Uri.parse(libUri);
-    if (!monacoEditor.editor.getModel(monacoUri)) {
-      monacoEditor.languages.typescript.javascriptDefaults.addExtraLib(declarationFile, libUri);
-      monacoEditor.editor.createModel(declarationFile, "typescript", monacoUri);
+    if (editor) {
+      editor.addCommand(monacoEditor.KeyMod.CtrlCmd | monacoEditor.KeyCode.KeyS, () => emits("save"));
+      editor.getModel()?.onDidChangeContent(() => emits("change", editor.getModel()?.getValue() ?? ""));
+      editor.setValue(props.value);
     }
-
-    editor = monacoEditor.editor.create(refEditor.value, {
-      value: props.value,
-      language: fileFormatMap.get(props.extension),
-      lineNumbers: "on",
-      roundedSelection: false,
-      scrollBeyondLastLine: true,
-      readOnly: false,
-      minimap: {
-        enabled: true,
-      },
-      wordWrap: "off",
-      overviewRulerBorder: false,
-      dimension: props.size ? { width: props.size.width, height: props.size.height } : undefined,
-      automaticLayout: !props.size
-    });
-
-    refEditorContainer.value!.addEventListener("keydown", (ev) => {
-      if (ev.ctrlKey && ev.code == "KeyS") {
-        ev.stopPropagation();
-      }
-    });
-
-    editor.addCommand(monacoEditor.KeyMod.CtrlCmd | monacoEditor.KeyCode.KeyS, () => emits("save"));
-
-    editor.getModel()?.onDidChangeContent(() => {
-      const content = editor.getModel()?.getValue();
-
-      if (props.value !== content)
-        emits("change", content ?? "");
-    });
   }
 });
 
-/* onUpdated(async () => {
+function createMonacoEditor(htmlElement: HTMLElement) {
+  console.log(props.size)
+  console.log(!props.size);
+
+  editor = monacoEditor.editor.create(htmlElement, {
+    language: fileFormatMap.get(props.extension),
+    largeFileOptimizations: true,
+    lineNumbers: "on",
+    roundedSelection: false,
+    scrollBeyondLastLine: true,
+    readOnly: false,
+    minimap: {
+      enabled: true,
+    },
+    wordWrap: "off",
+    overviewRulerBorder: false,
+    // dimension: props.size ? { width: props.size.width, height: props.size.height } : undefined,
+    automaticLayout: !props.size
+  });
+}
+
+function stopPropagationEventsInContainer() {
+  refEditorContainer.value!.addEventListener("keydown", (ev) => {
+    if (ev.ctrlKey && ev.code == "KeyS") {
+      ev.stopPropagation();
+    }
+  });
+}
+
+function addJavascriptConfiguration() {
+  monacoEditor.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+    noSemanticValidation: true,
+    noSyntaxValidation: false,
+    onlyVisible: false,
+  });
+
+  monacoEditor.languages.typescript.javascriptDefaults.setCompilerOptions({
+    target: monacoEditor.languages.typescript.ScriptTarget.Latest,
+    allowNonTsExtensions: true,
+    allowJs: true,
+    jsx: monacoEditor.languages.typescript.JsxEmit.ReactJSX,
+  });
+
+  let libUri = "ts:filename/untrusted-code.d.ts";
+  let monacoUri = monacoEditor.Uri.parse(libUri);
+  if (!monacoEditor.editor.getModel(monacoUri)) {
+    monacoEditor.languages.typescript.javascriptDefaults.addExtraLib(declarationFile, libUri);
+    monacoEditor.editor.createModel(declarationFile, "typescript", monacoUri);
+  }
+}
+
+onUpdated(async () => {
   if (editor) {
     const model = editor.getModel();
     editor.setValue(props.value);
@@ -101,7 +101,7 @@ onMounted(async () => {
       monacoEditor.editor.setModelLanguage(model, fileFormatMap.get(props.extension) ?? "plaintext");
     }
   }
-}); */
+});
 
 watch(() => props.size, (newSize, _) => {
   if (!newSize) return;

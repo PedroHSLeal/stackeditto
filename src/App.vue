@@ -34,10 +34,12 @@
       </DropdownMenu>
     </Topbar>
 
-    <div id="widgets" :style="{ height: `calc(100vh - ${TOPBAR_HEIGHT_IN_PIXELS}px)` }" style="flex-grow: 1; flex-shrink: 1; display: flex">
+    <div id="widgets" :style="{ height: widgetHeight }" style="display: flex">
       <Workspace v-if="showWorkspace" @onSelectDirectory="selectDirectory" @onSelectFile="openFile" @onSelectOpenedFile="reopenFile" @menuAction="triggerAction" :openedFiles="openedFiles" :workspaceData="store.$state.directory" :style="{ width: `${WORKSPACE_WIDTH_IN_PIXELS}px` }" style="flex-shrink: 0;" />
       <Welcome v-if="!anyApplication" @action="() => populateDirectory(true)" style="flex-grow: 1" />
-      <Editor v-if="anyApplication && fileValue" :value="fileValue" />
+      <div v-if="anyApplication && fileValue" :style="{ width: editorWidth }">
+        <Editor :value="fileValue" />
+      </div>
     </div>
 
     <ExtensionModal v-if="showExtension && !isMobile" :extensionFolder="store.$state.configDirectory!" @onTriggerNewFileOrDirectoryModal="(op) => showNewResourceModal(op, store.$state.configDirectory!, false)" @onConfirm="reloadDirectoryStructure" @onClose="() => showExtension = false" />
@@ -91,6 +93,9 @@ const isMobile = useMediaQuery("(max-width: 560px)");
 
 const TOPBAR_HEIGHT_IN_PIXELS = 32;
 const WORKSPACE_WIDTH_IN_PIXELS = 350;
+
+const editorWidth = computed(() => showWorkspace.value ? `calc(100% - ${WORKSPACE_WIDTH_IN_PIXELS}px)` : `100%`);
+const widgetHeight = `calc(100vh - ${TOPBAR_HEIGHT_IN_PIXELS}px)`;
 
 const anyApplication = computed(() => store.$state.originalHandler != null);
 
@@ -342,5 +347,6 @@ async function deleteResource(operation: ModalOperation) {
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100vw;
 }
 </style>
