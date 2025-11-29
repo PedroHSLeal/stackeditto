@@ -1,10 +1,10 @@
 <template>
-  <template v-if="isMarkdown()">
+  <template v-if="isMarkdown">
     <ProsemirrorContainer>
       <ProsemirrorEditor :value="fileValue" />
     </ProsemirrorContainer>
   </template>
-  <template v-else-if="!isMarkdown() && (fileValue && fileExtension)">
+  <template v-else-if="!isMarkdown && (fileValue && fileExtension)">
     <MonacoEditor :value="fileValue" :extension="fileExtension" />
   </template>
 </template>
@@ -22,9 +22,7 @@ const props = defineProps<{ value?: CustomFile }>();
 const fileValue = shallowRef("");
 const fileExtension = shallowRef("");
 
-function isMarkdown() {
-  return fileExtension.value == "md";
-}
+const isMarkdown = computed(() => fileExtension.value == "md");
 
 async function updateFile() {
   if (props.value) {
