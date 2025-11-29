@@ -42,7 +42,7 @@
       </div>
     </div>
 
-    <ExtensionModal v-if="showExtension && !isMobile" :extensionFolder="store.$state.configDirectory!" @onTriggerNewFileOrDirectoryModal="(op) => showNewResourceModal(op, store.$state.configDirectory!, false)" @onConfirm="reloadDirectoryStructure" @onClose="() => showExtension = false" />
+    <ExtensionModal v-if="showExtension && !isMobile" :extensionFolder="store.$state.configDirectory!" @onNewResource="(op) => showNewResourceModal(op, store.$state.configDirectory!, false)" @onConfirm="reloadDirectoryStructure" @onClose="() => showExtension = false" />
     <NewFileOrDirectoryModal v-if="showNewResource" :workspace="newResourceWorkspace!" :operation="newResourceOperation!" @onConfirm="saveNewFileOrDirectory" @onCancel="showNewResource = false" />
     <RenameResourceModal v-if="showRenameResource" :resourceName="renameResourceName" :operation="renameResourceOperation!" @onConfirm="renameResource" @onCancel="() => showRenameResource = false" />
     <DeleteResourceModal v-if="showDeleteResource" :operation="deleteResourceOperation!" @onConfirm="deleteResource" @onCancel="() => showDeleteResource = false" />
