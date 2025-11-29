@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUpdated, reactive, ref, useTemplateRef, watch } from "vue";
+import { onMounted, onUpdated, useTemplateRef, watch } from "vue";
 import * as monacoEditor from "monaco-editor";
 
 import declarationFile from "@/services/untrusted-code-extensions/index.d.ts?raw";
@@ -41,10 +41,25 @@ onMounted(() => {
   }
 });
 
-function createMonacoEditor(htmlElement: HTMLElement) {
-  console.log(props.size)
-  console.log(!props.size);
+onUpdated(() => {
+  if (editor) {
+    const model = editor.getModel();
+    editor.setValue(props.value);
 
+    if (model && props.extension) {
+      monacoEditor.editor.setModelLanguage(model, fileFormatMap.get(props.extension) ?? "plaintext");
+    }
+  }
+});
+
+watch(() => props.size, (newSize) => {
+  if (!newSize) return;
+
+  if (editor)
+    editor.layout({ width: newSize.width, height: newSize.height });
+});
+
+function createMonacoEditor(htmlElement: HTMLElement) {
   editor = monacoEditor.editor.create(htmlElement, {
     language: fileFormatMap.get(props.extension),
     largeFileOptimizations: true,
@@ -57,13 +72,15 @@ function createMonacoEditor(htmlElement: HTMLElement) {
     },
     wordWrap: "off",
     overviewRulerBorder: false,
-    // dimension: props.size ? { width: props.size.width, height: props.size.height } : undefined,
+    dimension: props.size ? { width: props.size.width, height: props.size.height } : undefined,
     automaticLayout: !props.size
   });
 }
 
 function stopPropagationEventsInContainer() {
-  refEditorContainer.value!.addEventListener("keydown", (ev) => {
+  if (!refEditorContainer.value) return;
+
+  refEditorContainer.value.addEventListener("keydown", (ev) => {
     if (ev.ctrlKey && ev.code == "KeyS") {
       ev.stopPropagation();
     }
@@ -91,23 +108,5 @@ function addJavascriptConfiguration() {
     monacoEditor.editor.createModel(declarationFile, "typescript", monacoUri);
   }
 }
-
-onUpdated(async () => {
-  if (editor) {
-    const model = editor.getModel();
-    editor.setValue(props.value);
-
-    if (model && props.value && props.extension) {
-      monacoEditor.editor.setModelLanguage(model, fileFormatMap.get(props.extension) ?? "plaintext");
-    }
-  }
-});
-
-watch(() => props.size, (newSize, _) => {
-  if (!newSize) return;
-
-  if (editor)
-    editor.layout({ width: newSize.width, height: newSize.height });
-});
 
 </script>
