@@ -72,7 +72,7 @@ export const specification: SchemaSpec = {
       toDOM: (node) => ["ol", { start: node.attrs.order }, 0]
     },
     list_item: {
-      content: "paragraph",
+      content: "paragraph*",
       defining: true,
       attrs: {
         value: { default: null }
@@ -162,10 +162,5 @@ export const specification: SchemaSpec = {
       parseDOM: [{ tag: "code" }],
       toDOM() { return ["code", 0] }
     },
-    /* html_inline: {
-      attrs: { params: { default: {} } },
-      parseDOM: [{ tag: "br" }],
-      toDOM: () => { return ["br"] }
-    }, */
   }
 };
