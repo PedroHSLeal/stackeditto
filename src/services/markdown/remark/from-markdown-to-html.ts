@@ -10,7 +10,7 @@ import {
   type RemarkProseMirrorOptions,
 } from "@handlewithcare/remark-prosemirror";
 
-import { type Node } from "prosemirror-model";
+import { Schema, type Node } from "prosemirror-model";
 
 import { mySchema } from "@/services/prosemirror";
 import { chooseRegex } from "@/services/prosemirror/tokens/html-tokens";
@@ -23,14 +23,14 @@ export async function markdownToProseMirror(markdown: UnifiedValue): Promise<Nod
     .use(remarkFrontmatter)
     .use(remarkProseMirror, {
       schema: mySchema,
-      handlers: remarkProsemirrorHandlers
+      handlers: remarkProsemirrorHandlers(mySchema)
     })
     .process(markdown);
 
   return doc.result;
 }
 
-const remarkProsemirrorHandlers = {
+const remarkProsemirrorHandlers = (mySchema: Schema) => ({
   // NODES:
   root: toPmNode(mySchema.nodes.doc),
   heading: toPmNode(mySchema.nodes.heading, (node) => ({ level: node.depth })),
@@ -119,5 +119,5 @@ const remarkProsemirrorHandlers = {
   }),
   inlineCode: toPmMark(mySchema.marks.code),
   delete: toPmMark(mySchema.marks.s),
-} satisfies RemarkProseMirrorOptions['handlers'];
+}) satisfies RemarkProseMirrorOptions['handlers'];
 
