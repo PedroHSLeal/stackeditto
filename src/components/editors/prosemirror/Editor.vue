@@ -1,5 +1,5 @@
 <template>
-    <div ref="refEditor" id="prosemirror-editor" class="fancy-scroll" style="flex-grow: 1; width: 100%; overflow: auto" />
+    <div ref="refEditor" id="prosemirror-editor" />
 </template>
 
 <script setup lang="ts">

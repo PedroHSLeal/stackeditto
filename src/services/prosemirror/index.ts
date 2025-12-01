@@ -3,12 +3,8 @@ import { dropCursor } from "prosemirror-dropcursor";
 import { gapCursor } from "prosemirror-gapcursor";
 import { keymap } from "prosemirror-keymap";
 import { Schema } from "prosemirror-model";
-import { EditorState, Selection, Transaction } from "prosemirror-state";
+import { EditorState } from "prosemirror-state";
 import { EditorView, type NodeViewConstructor } from "prosemirror-view";
-
-import { createHighlightPlugin } from 'prosemirror-highlight';
-import { createParser } from 'prosemirror-highlight/shiki';
-import { getSingletonHighlighter } from 'shiki';
 
 import { buildInputRules } from "./input-rules";
 import { buildKeymap } from "./keymaps";
@@ -16,32 +12,20 @@ import { specification } from "./schema";
 import { HtmlBlockView } from "./node-views/html-block";
 import { markdownToProseMirror, proseMirrorToMarkdown, type Value } from "../markdown/remark";
 import { getUntrustedHtmlBlock } from "../untrusted-code-extensions";
-
-let view: EditorView;
+import { highlightPlugin } from "./plugins/shiki-code-block";
 
 export const mySchema = new Schema(specification);
 
-type NodeView = { [node: string]: NodeViewConstructor };
-
-const highlighter = await getSingletonHighlighter({
-  themes: ['github-light'],
-  langs: ['javascript', 'typescript', 'python', 'csharp', 'powershell', 'asm'],
-})
-
-export const defaultNodeViews: NodeView = {
+export const defaultNodeViews: { [node: string]: NodeViewConstructor } = {
   html_block: (node, view, getPos, decorations, innerDecorations) => new HtmlBlockView(node, view, getPos, decorations, innerDecorations),
 };
 
-export function defaultView(element: Element, state: EditorState, nodeViews: NodeView) {
-  view = new EditorView(element, {
+export function defaultView(element: Element, state: EditorState, nodeViews: typeof defaultNodeViews) {
+  return new EditorView(element, {
     state,
     nodeViews
   });
-
-  return view;
 }
-
-export function getView(): EditorView | undefined { return view; }
 
 export async function buildViewState(content: Value) {
   return EditorState.create({
@@ -55,7 +39,7 @@ export async function buildViewState(content: Value) {
 
       dropCursor(),
       gapCursor(),
-      createHighlightPlugin({ parser: createParser(highlighter), nodeTypes: ['code_block'] }),
+      highlightPlugin
     ],
   })
 }
@@ -65,10 +49,10 @@ export function updateView(view: EditorView, content: Value) {
     .then(state => view.updateState(state));
 }
 
-export async function getViewTextContent() {
+export async function getViewTextContent(view: EditorView) {
   let outsideHtmlMap: Map<string, string> = new Map();
 
-  for (const childElement of getView()!.dom.children) {
+  for (const childElement of view.dom.children) {
     let tag = childElement.getAttributeNS("stack-and-ditto", "tag");
     let position = childElement.getAttributeNS("stack-and-ditto", "position")
 
@@ -79,7 +63,7 @@ export async function getViewTextContent() {
     }
   }
 
-  let markdownContent = await proseMirrorToMarkdown(getView()!.state.doc);
+  let markdownContent = await proseMirrorToMarkdown(view.state.doc);
 
   for (const key of outsideHtmlMap.keys()) {
     let [tag] = key.split("___");

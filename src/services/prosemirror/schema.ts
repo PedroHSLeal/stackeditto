@@ -1,4 +1,5 @@
 import type { SchemaSpec } from "prosemirror-model";
+import { extractLanguageForHighlight, plainText } from "./plugins/shiki-code-block";
 
 export const specification: SchemaSpec = {
   nodes: {
@@ -19,7 +20,7 @@ export const specification: SchemaSpec = {
     },
     heading: {
       attrs: { level: { default: 1 } },
-      content: "(text | image)*",
+      content: "text*",
       group: "block",
       defining: true,
       parseDOM: [
@@ -72,7 +73,7 @@ export const specification: SchemaSpec = {
       toDOM: (node) => ["ol", { start: node.attrs.order }, 0]
     },
     list_item: {
-      content: "paragraph*",
+      content: "(paragraph)+",
       defining: true,
       attrs: {
         value: { default: null }
@@ -87,12 +88,12 @@ export const specification: SchemaSpec = {
       defining: true,
       marks: "",
       attrs: {
-        language: { default: "plaintext" },
+        language: { default: plainText },
         content: {default: "" }
       },
       parseDOM: [{ tag: "pre" }],
       toDOM: (node) => {
-        return ["pre", { "data-language": node.attrs.language ?? "plaintext" }, ["code", 0]];
+        return ["pre", { "data-language": node.attrs.language ?? plainText }, ["code", 0]];
       }
     },
     hard_break: {

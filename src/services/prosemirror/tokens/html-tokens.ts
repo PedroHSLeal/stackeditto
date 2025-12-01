@@ -1,7 +1,3 @@
-import type { Attrs } from "prosemirror-model";
-import type { ParseSpec } from "prosemirror-markdown";
-import type Token from "~/@types/markdown-it/lib/token.mjs";
-
 // <asdf-asdf_ASDF-123>(...)</asdf-asdf_ASDF-123>
 const htmlFullWithoutAttrs = (content: string) => {
   let regex = /^(?<start_tag><(?:\w|\-|\_)+>)(?<content>(?:.|\n)*)(?<finish_tag><\/(?:\w|\-|\_)+>)/gms;
@@ -52,30 +48,4 @@ export function chooseRegex(content: string): ({ tag: string, content?: string, 
     htmlFullWithAttrs(content),
     htmlSelfClosing(content),
   ]
-}
-
-function htmlAttrs(token: Token, tokenStream: Token[], index: number, typeFunc: (result: { tag: string, [p: string]: any }) => any): Attrs | null {
-  let results = chooseRegex(token.content);
-  let result = results.find(r => !!r)!;
-
-  if (result) return typeFunc(result);
-}
-
-const block = (result: { tag: string, [p: string]: any }) => {
-  return {
-    ...result,
-    tag: result!.tag
-  };
-}
-
-const inline = (result: { tag: string, [p: string]: any }) => {
-  return {
-    ...result,
-    tag: result!.tag
-  };
-}
-
-export const htmlTokens: { [name: string]: ParseSpec } = {
-  html_block: { node: "html_block", noCloseToken: true, getAttrs: (t, ts, i) => ({ params: htmlAttrs(t, ts, i, block) }) },
-  html_inline: { mark: "html_inline", noCloseToken: true, getAttrs: (t, ts, i) => ({ params: htmlAttrs(t, ts, i, inline) }) },
 }

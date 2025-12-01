@@ -37,7 +37,7 @@
     <div id="widgets" :style="{ height: widgetHeight }" style="display: flex">
       <Workspace v-if="showWorkspace" @onSelectDirectory="selectDirectory" @onSelectFile="openFile" @onSelectOpenedFile="reopenFile" @menuAction="triggerAction" :openedFiles="openedFiles" :workspaceData="store.$state.directory" :style="{ width: `${WORKSPACE_WIDTH_IN_PIXELS}px` }" style="flex-shrink: 0;" />
       <Welcome v-if="!anyApplication" @action="() => populateDirectory(true)" style="flex-grow: 1" />
-      <div v-if="anyApplication && fileValue" :style="{ width: editorWidth }">
+      <div v-if="anyApplication && fileValue" :style="{ width: editorWidth }" class="fancy-scroll" style="overflow: auto">
         <Editor :value="fileValue" />
       </div>
     </div>

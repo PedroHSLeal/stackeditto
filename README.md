@@ -70,8 +70,3 @@ Na versão v0.1, este projeto consiste em testar um pouco as capacidades de
  - indexedDB para indexar os arquivos e fazer processamento dos arquivos
  - ver a performance de leitura de arquivos, a principio para extensoes para posteriormente ser usado por find/replace
  - libs importantes pra adicionar pro projeto: browser-fs-access, dixie.js
-
-### perguntas que surgiram que preciso responder depois...
- - com a troca de arquivos, os plugins nao reconhecem que foi o estado da view mudou
- - - será que o init() dos plugins é chamado?
- - - se, com a mudanca dos documentos, o update do state dos plugins pode ficar caro?

@@ -1,7 +1,7 @@
 <template>
   <template v-if="isMarkdown">
     <ProsemirrorContainer>
-      <ProsemirrorEditor :value="fileValue" />
+      <ProsemirrorEditor :value="fileValue" style="flex-grow: 1" />
     </ProsemirrorContainer>
   </template>
   <template v-else-if="!isMarkdown && (fileValue && fileExtension)">
