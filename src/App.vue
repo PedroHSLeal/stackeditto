@@ -78,7 +78,7 @@ import { useFileSystem } from './services/file-system';
 import { EXTENSION_STRUCTURE, useUntrustedScripts, useUntrustedModules } from '@/services/untrusted-code-extensions';
 
 import { useFileSystemStore } from './store/file-system';
-import { getViewTextContent } from './services/prosemirror';
+import { getProsemirrorText } from './services/prosemirror';
 import { useOpenFiles } from './services/opened-files';
 import { type Value } from './services/markdown/remark';
 
@@ -163,7 +163,7 @@ async function executeUntrustedScripts() {
 }
 
 async function saveFile() {
-  fs.saveFile(of.getLastOpenedFile()!.handler, await getViewTextContent());
+  fs.saveFile(of.getLastOpenedFile()!.handler, await getProsemirrorText());
 }
 
 async function reloadDirectoryStructure() {
@@ -216,7 +216,7 @@ async function openFile(fileInWorkspace: CustomFile) {
   }
 
   if (of.hasFile(fileInWorkspace.webkitRelativePath))
-    await saveTemporaryChangesInFile(of.getLastOpenedFile()!.handler, fileKey.value, await getViewTextContent());
+    await saveTemporaryChangesInFile(of.getLastOpenedFile()!.handler, fileKey.value, await getProsemirrorText());
   else
     await saveTemporaryChangesInFile(fileInWorkspace.handle, fileInWorkspace.webkitRelativePath, await fileInWorkspace.text());
 
@@ -229,7 +229,7 @@ async function reopenFile(openedFileRelativePath: string) {
     showWorkspace.value = false;
   }
 
-  let viewTextContent = await getViewTextContent();
+  let viewTextContent = await getProsemirrorText();
 
   of.updateFile(fileKey.value, viewTextContent);
 

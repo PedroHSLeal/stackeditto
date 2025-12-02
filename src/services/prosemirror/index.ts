@@ -14,20 +14,24 @@ import { markdownToProseMirror, proseMirrorToMarkdown, type Value } from "../mar
 import { getUntrustedHtmlBlock } from "../untrusted-code-extensions";
 import { highlightPlugin } from "./plugins/shiki-code-block";
 
+let defaultView: EditorView;
+
 export const mySchema = new Schema(specification);
 
 export const defaultNodeViews: { [node: string]: NodeViewConstructor } = {
   html_block: (node, view, getPos, decorations, innerDecorations) => new HtmlBlockView(node, view, getPos, decorations, innerDecorations),
 };
 
-export function defaultView(element: Element, state: EditorState, nodeViews: typeof defaultNodeViews) {
-  return new EditorView(element, {
+export function buildProsemirrorView(element: Element, state: EditorState, nodeViews: typeof defaultNodeViews) {
+  defaultView = new EditorView(element, {
     state,
     nodeViews
   });
+
+  return defaultView;
 }
 
-export async function buildViewState(content: Value) {
+export async function buildProsemirrorState(content: Value) {
   return EditorState.create({
     doc: await markdownToProseMirror(content),
     plugins: [
@@ -44,15 +48,16 @@ export async function buildViewState(content: Value) {
   })
 }
 
-export function updateView(view: EditorView, content: Value) {
-  buildViewState(content)
-    .then(state => view.updateState(state));
+export async function updateProsemirrorView(view: EditorView, content: Value) {
+  let state = await buildProsemirrorState(content)
+  view.updateState(state);
 }
 
-export async function getViewTextContent(view: EditorView) {
+export async function getProsemirrorText(view?: EditorView) {
+  let chosenView = view ?? defaultView;
   let outsideHtmlMap: Map<string, string> = new Map();
 
-  for (const childElement of view.dom.children) {
+  for (const childElement of chosenView.dom.children) {
     let tag = childElement.getAttributeNS("stack-and-ditto", "tag");
     let position = childElement.getAttributeNS("stack-and-ditto", "position")
 
@@ -63,7 +68,7 @@ export async function getViewTextContent(view: EditorView) {
     }
   }
 
-  let markdownContent = await proseMirrorToMarkdown(view.state.doc);
+  let markdownContent = await proseMirrorToMarkdown(chosenView.state.doc);
 
   for (const key of outsideHtmlMap.keys()) {
     let [tag] = key.split("___");

@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { buildViewState, defaultNodeViews, defaultView, updateView } from '@/services/prosemirror';
+import { buildProsemirrorState, defaultNodeViews, buildProsemirrorView, updateProsemirrorView } from '@/services/prosemirror';
 import { onMounted, useTemplateRef, watch, watchEffect } from 'vue';
 import type { EditorView } from 'prosemirror-view';
 
@@ -15,7 +15,7 @@ let view: EditorView;
 
 onMounted(async () => {
   try {
-    view = defaultView(refEditor.value!, await buildViewState(props.value), defaultNodeViews);
+    view = buildProsemirrorView(refEditor.value!, await buildProsemirrorState(props.value), defaultNodeViews);
   } catch (error) {
     console.error(error);
   }
@@ -24,7 +24,7 @@ onMounted(async () => {
 watch(() => props.value, async (newV) => {
   if (view) {
     try {
-      updateView(view, newV);
+      await updateProsemirrorView(view, newV);
     } catch (error) {
       console.error(error);
     }
