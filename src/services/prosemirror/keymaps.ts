@@ -1,10 +1,8 @@
 import { wrapIn, setBlockType, chainCommands, toggleMark, exitCode, joinUp, joinDown, lift, selectParentNode } from "prosemirror-commands";
 import { wrapInList, splitListItem, liftListItem, sinkListItem } from "prosemirror-schema-list";
 import { undo, redo } from "prosemirror-history";
-import { InputRule, undoInputRule } from "prosemirror-inputrules";
-import type { Command, EditorState, Plugin, Transaction } from "prosemirror-state";
+import type { Command } from "prosemirror-state";
 import { Schema } from "prosemirror-model";
-import type { EditorView } from "prosemirror-view";
 
 const mac = typeof navigator != "undefined" ? /Mac|iP(hone|[oa]d)/.test(navigator.platform) : false
 
@@ -51,7 +49,7 @@ export function buildKeymap(schema: Schema, mapKeys?: { [key: string]: false | s
   bind("Shift-Mod-z", redo)
   if (!mac) bind("Mod-y", redo)
 
-  bind("Backspace", /*undoInputRule*/(state, dispatch) => {
+  bind("Backspace", (state, dispatch) => {
     for (const plugin of state.plugins) {
       let undoable = plugin.getState(state);
       let cursorAtNode = state.selection.$anchor.node();
@@ -73,34 +71,6 @@ export function buildKeymap(schema: Schema, mapKeys?: { [key: string]: false | s
             dispatch(tr)
           }
           return true;
-        }
-        else {
-
-          // a regra de tornar aqui o cabecalho em paragrafo pode se encaixar aqui
-          if (cursorAtNode.type.name == "heading") {
-            let content = cursorAtNode.textContent;
-
-            if (dispatch) {
-              // se o conteudo estiver vazio, pode virar um paragrafo vazio
-              if (content == "") {
-                let tr = state.tr
-                  .setBlockType(state.selection.from, undefined, schema.nodes.paragraph)
-                  .insertText("#".repeat(cursorAtNode.attrs.level) + " ", state.selection.from);
-
-                dispatch(tr);
-                return true;
-              }
-              // se tiver alguma coisa, e o cursor estiver na posicao 0, pode virar um paragrafo
-              else if (!state.selection.$anchor.nodeBefore && state.selection.$anchor.nodeAfter) {
-                let tr = state.tr
-                  .setBlockType(state.selection.from, undefined, schema.nodes.paragraph);
-
-                dispatch(tr);
-                return true;
-              }
-            }
-          }
-          return false;
         }
       }
     }
