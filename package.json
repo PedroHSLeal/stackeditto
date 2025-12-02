@@ -16,6 +16,7 @@
     "@handlewithcare/remark-prosemirror": "^0.1.5",
     "@vueuse/core": "^12.7.0",
     "browser-fs-access": "^0.38.0",
+    "driver.js": "^1.4.0",
     "memfs": "^4.17.0",
     "monaco-editor": "^0.52.2",
     "pinia": "^2.2.6",

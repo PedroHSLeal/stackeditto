@@ -9,6 +9,7 @@
         <h3 style="font-weight: 500">Funções básicas</h3>
         <div style="display: flex; flex-direction: row; gap: 8px; justify-content: center;">
           <button class="primary" @click="() => emits('action', 'openWorkspace')">Workspace</button>
+          <button class="primary" @click="seila">Tour</button>
         </div>
       </div>
     </div>
@@ -22,6 +23,7 @@
 
 <script setup lang="ts">
 import logo from "@/assets/Phantom.svg";
+import { highlight } from "@/services/tour";
 import jokesSentences from "@/templates/jokes-sentences.txt?raw";
 import { onBeforeUnmount, onMounted, shallowRef } from "vue";
 
@@ -44,6 +46,10 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearInterval(intervalId);
 });
+
+function seila(evt: PointerEvent) {
+  highlight(evt.target as Element);
+}
 </script>
 
 <style scoped lang="scss">
