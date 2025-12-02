@@ -77,3 +77,12 @@ export async function getProsemirrorText(view?: EditorView) {
 
   return markdownContent;
 }
+
+export function executeCommand(commandFn: (view: EditorView, state: EditorState, dispathFn: EditorView["dispatch"]) => unknown, view?: EditorView) {
+  let chosenView = view ?? defaultView;
+
+  let state = chosenView.state;
+  let dispatch = chosenView.dispatch;
+
+  commandFn(chosenView, state, dispatch);
+}

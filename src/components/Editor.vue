@@ -1,6 +1,7 @@
 <template>
   <template v-if="isMarkdown">
     <ProsemirrorContainer>
+      <ProsemirrorActionMenu :actions="defaultTopMenuActions" />
       <ProsemirrorEditor :value="fileValue" style="flex-grow: 1" />
     </ProsemirrorContainer>
   </template>
@@ -13,9 +14,11 @@ import { computed, onBeforeUpdate, onMounted, onUpdated, shallowRef } from 'vue'
 
 import ProsemirrorEditor from './editors/prosemirror/Editor.vue';
 import ProsemirrorContainer from './editors/prosemirror/Container.vue';
+import ProsemirrorActionMenu from './editors/prosemirror/TopMenu.vue';
 import MonacoEditor from './editors/monaco/Editor.vue';
 
 import type { CustomFile } from '@/models/file';
+import { defaultTopMenuActions } from '@/models/top-menu';
 
 const props = defineProps<{ value?: CustomFile }>();
 
