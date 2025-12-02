@@ -1,5 +1,9 @@
 import "@/main.scss";
+
 import "prosemirror-view/style/prosemirror.css";
+
+import "driver.js/dist/driver.css";
+import "@/services/tour/style.scss";
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

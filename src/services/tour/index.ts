@@ -1,8 +1,8 @@
-import "driver.js/dist/driver.css";
-
 import { driver } from "driver.js";
 
-const driverTour = driver();
+const driverTour = driver({
+  popoverClass: 'tour'
+});
 
 export function highlight(element: Element) {
   driverTour.highlight({
