@@ -9,7 +9,7 @@
         <h3 style="font-weight: 500">Funções básicas</h3>
         <div style="display: flex; flex-direction: row; gap: 8px; justify-content: center;">
           <button class="primary" @click="() => emits('action', 'openWorkspace')">Workspace</button>
-          <button class="primary" @click="seila">Tour</button>
+          <button class="primary" @click="() => emits('action', 'tour')">Tour</button>
         </div>
       </div>
     </div>
@@ -23,15 +23,16 @@
 
 <script setup lang="ts">
 import logo from "@/assets/Phantom.svg";
-import { highlight } from "@/services/tour";
+import type { WelcomeAction } from "@/models/welcome";
 import jokesSentences from "@/templates/jokes-sentences.txt?raw";
 import { onBeforeUnmount, onMounted, shallowRef } from "vue";
 
 const jokes = shallowRef(jokesSentences.split('\n'));
 const joke = shallowRef<string | null>(null);
+
 let intervalId: number;
 
-const emits = defineEmits<{ (e: "action", action: "openWorkspace" | "tour"): void }>();
+const emits = defineEmits<{ (e: "action", action: WelcomeAction): void }>();
 
 onMounted(() => {
   intervalId = window.setInterval(() => {
@@ -46,10 +47,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearInterval(intervalId);
 });
-
-function seila(evt: PointerEvent) {
-  highlight(evt.target as Element);
-}
 </script>
 
 <style scoped lang="scss">

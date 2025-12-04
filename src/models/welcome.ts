@@ -1,0 +1,1 @@
+export type WelcomeAction = "tour" | "openWorkspace";

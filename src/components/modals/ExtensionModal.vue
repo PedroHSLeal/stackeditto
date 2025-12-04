@@ -27,7 +27,7 @@ import TreeView from '../TreeView/TreeView.vue';
 import MonacoEditor from '../editors/monaco/Editor.vue';
 import Topbar from '../Topbar.vue';
 
-import { ModalOperation, type CustomDirectory, type CustomFile } from '@/models/file';
+import { ModalOperation, type CustomDirectory, type CustomFile } from '@/models/file-system';
 import { useFileSystem } from '@/services/file-system';
 
 const selectedFile = shallowRef<FileSystemFileHandle>();

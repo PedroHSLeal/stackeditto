@@ -1,4 +1,4 @@
-import type { CustomDirectory } from "@/models/file";
+import type { CustomDirectory } from "@/models/file-system";
 import { EXTENSION_STRUCTURE } from "./constants/extension-structure";
 
 export function useExtensionConfigs() {

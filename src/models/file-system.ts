@@ -16,3 +16,5 @@ export enum ModalOperation {
   FILE,
   DIRECTORY
 };
+
+export const EXCLUDED_DIRECTORIES = [".git", ".obsidian"];

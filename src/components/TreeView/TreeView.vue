@@ -22,7 +22,7 @@ import { onMounted, reactive, ref, watch } from 'vue';
 import DirectoryItem from './DirectoryItem.vue';
 import FileItem from './FileItem.vue';
 
-import type { CustomDirectory, CustomFile } from '@/models/file';
+import type { CustomDirectory, CustomFile } from '@/models/file-system';
 
 onMounted(() => { });
 

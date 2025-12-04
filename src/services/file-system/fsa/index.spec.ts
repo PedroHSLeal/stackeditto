@@ -2,8 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { nodeToFsa } from "memfs/lib/node-to-fsa";
 import { fs, memfs, vol } from "memfs";
 import { useFileSystem } from ".";
-import type { CustomDirectory } from "@/models/file";
-import { EXTENSION_STRUCTURE, useExtensions } from "../extension";
+import { EXTENSION_STRUCTURE } from "@/services/untrusted-code-extensions";
 
 describe("file-system service suite", async () => {
   // eu nao sei se esse tipo de teste é realmente necessário, porém estou fazendo para caso mais de estudo

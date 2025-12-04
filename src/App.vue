@@ -30,13 +30,14 @@
         </template>
         <template #dropdown="{ showModalFn }">
           <button @click="() => { saveFile(); showModalFn() }">Salvar Arquivo</button>
+          <!-- TODO: salvar todas as alteracoes no opened files -->
         </template>
       </DropdownMenu>
     </Topbar>
 
     <div id="widgets" :style="{ height: widgetHeight }" style="display: flex">
-      <Workspace v-if="showWorkspace" @onSelectDirectory="selectDirectory" @onSelectFile="openFile" @onSelectOpenedFile="reopenFile" @menuAction="triggerAction" :openedFiles="openedFiles" :workspaceData="store.$state.directory" :style="{ width: `${WORKSPACE_WIDTH_IN_PIXELS}px` }" style="flex-shrink: 0;" />
-      <Welcome v-if="!anyApplication" @action="() => populateDirectory(true)" style="flex-grow: 1" />
+      <Workspace v-if="showWorkspace" @onSelectDirectory="selectDirectory" @onSelectFile="openFile" @onSelectOpenedFile="reopenFile" @menuAction="triggerMenuAction" :openedFiles="openedFiles" :workspaceData="store.$state.directory" :style="{ width: `${WORKSPACE_WIDTH_IN_PIXELS}px` }" style="flex-shrink: 0;" />
+      <Welcome v-if="!anyApplication" @action="triggerWelcomeAction" style="flex-grow: 1" />
       <div v-if="anyApplication && fileValue" :style="{ width: editorWidth }" class="fancy-scroll" style="overflow: auto">
         <Editor :value="fileValue" />
       </div>
@@ -70,8 +71,8 @@ import DropdownMenu from './components/DropdownMenu.vue';
 import Editor from './components/Editor.vue';
 import Welcome from './components/Welcome.vue';
 
-import type { CustomDirectory, CustomFile } from './models/file';
-import { ModalOperation } from './models/file';
+import type { CustomDirectory, CustomFile } from './models/file-system';
+import { ModalOperation } from './models/file-system';
 
 import { useFileSystem } from './services/file-system';
 
@@ -83,6 +84,7 @@ import { useOpenFiles } from './services/opened-files';
 import { type Value } from './services/markdown/remark';
 
 import type { MenuAction } from './models/workspace';
+import type { WelcomeAction } from './models/welcome';
 
 const of = useOpenFiles();
 const fs = useFileSystem();
@@ -240,7 +242,24 @@ async function reopenFile(openedFileRelativePath: string) {
   fileValue.value = customFile;
 }
 
-async function triggerAction(type: MenuAction, resource: CustomDirectory | CustomFile) {
+function triggerWelcomeAction(type: WelcomeAction) {
+  switch (type) {
+    case 'tour':
+      /* navigator.storage.getDirectory().then((dir) => {
+        store.$patch({ originalHandler: dir });
+
+        showWorkspace.value = true;
+        showEditor.value = true;
+      }); */
+      break;
+    case 'openWorkspace':
+      break;
+    default:
+      break;
+  }
+}
+
+async function triggerMenuAction(type: MenuAction, resource: CustomDirectory | CustomFile) {
   switch (type) {
     case 'newFile':
       showNewResourceModal(ModalOperation.FILE, (resource as CustomDirectory), false);

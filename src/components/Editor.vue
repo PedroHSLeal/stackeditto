@@ -17,7 +17,7 @@ import ProsemirrorContainer from './editors/prosemirror/Container.vue';
 import ProsemirrorActionMenu from './editors/prosemirror/TopMenu.vue';
 import MonacoEditor from './editors/monaco/Editor.vue';
 
-import type { CustomFile } from '@/models/file';
+import type { CustomFile } from '@/models/file-system';
 import { defaultTopMenuActions } from '@/models/top-menu';
 
 const props = defineProps<{ value?: CustomFile }>();

@@ -23,7 +23,7 @@ import { computed } from 'vue';
 
 import { Icon } from "@iconify/vue";
 
-import { ModalOperation } from '@/models/file';
+import { ModalOperation } from '@/models/file-system';
 
 import Modal from '../Modal.vue';
 

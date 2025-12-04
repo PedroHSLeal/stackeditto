@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
 
-import type { CustomDirectory } from "@/models/file";
+import type { CustomDirectory } from "@/models/file-system";
 
 defineProps<{ directory: CustomDirectory, selected: boolean }>();
 

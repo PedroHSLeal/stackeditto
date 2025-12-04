@@ -20,8 +20,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 
-import { ModalOperation } from '@/models/file';
-import type { CustomDirectory } from '@/models/file';
+import { ModalOperation } from '@/models/file-system';
 
 import Modal from '../Modal.vue';
 

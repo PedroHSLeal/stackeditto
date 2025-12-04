@@ -10,8 +10,6 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
 
-import type { CustomFile } from "@/models/file";
-
 defineProps<{ fileName: string }>();
 
 const emits = defineEmits<{ (e: "clicked"): void }>();

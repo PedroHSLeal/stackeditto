@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 import TreeView from "./TreeView.vue";
-import type { SimpleDirectory, SimpleFile } from "@/models/file";
 
 // testes pulados por questao de insaniedade
 describe.skip("TreeView component suite", async () => {

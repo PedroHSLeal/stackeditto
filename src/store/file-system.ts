@@ -1,6 +1,5 @@
 
-import { type CustomDirectory, type CustomFile } from "@/models/file";
-import type { DiffResult } from "@/utils/diff";
+import { type CustomDirectory, type CustomFile } from "@/models/file-system";
 import { defineStore } from "pinia";
 
 export type StoreState = {

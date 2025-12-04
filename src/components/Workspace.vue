@@ -51,7 +51,7 @@
 import { Icon } from "@iconify/vue";
 import TreeView from './TreeView/TreeView.vue';
 
-import type { CustomDirectory, CustomFile } from '@/models/file';
+import type { CustomDirectory, CustomFile } from '@/models/file-system';
 import FileItem from "./TreeView/FileItem.vue";
 import { onBeforeUnmount, onMounted, ref, useTemplateRef } from "vue";
 import type { MenuAction } from "@/models/workspace";
