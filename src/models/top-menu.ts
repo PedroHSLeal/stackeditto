@@ -15,7 +15,7 @@ export const defaultTopMenuActions: Menu[] = [
 
     // lists
     { icon: "material-symbols:format-list-numbered", fn: setOrderedListAction },
-{ icon: "material-symbols:format-list-bulleted", fn: setBulletedListAction }
+    { icon: "material-symbols:format-list-bulleted", fn: setBulletedListAction }
   ]
 ]
 
