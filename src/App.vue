@@ -245,12 +245,6 @@ async function reopenFile(openedFileRelativePath: string) {
 function triggerWelcomeAction(type: WelcomeAction) {
   switch (type) {
     case 'tour':
-      /* navigator.storage.getDirectory().then((dir) => {
-        store.$patch({ originalHandler: dir });
-
-        showWorkspace.value = true;
-        showEditor.value = true;
-      }); */
       break;
     case 'openWorkspace':
       break;
