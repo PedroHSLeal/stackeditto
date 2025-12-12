@@ -85,9 +85,13 @@ import { type Value } from './services/markdown/remark';
 
 import type { MenuAction } from './models/workspace';
 import type { WelcomeAction } from './models/welcome';
+import { useFileSystemManipulation } from './services/file-system/utils';
+
+let fs: ReturnType<typeof useFileSystem>;
 
 const of = useOpenFiles();
-const fs = useFileSystem();
+const fsImpl = useFileSystemManipulation();
+
 const { executeUntrustedScript } = useUntrustedScripts();
 const { registerUntrustedModules } = useUntrustedModules();
 const store = useFileSystemStore();
@@ -129,12 +133,14 @@ let resourceActionData: CustomDirectory | CustomFile | null = null;
 onMounted(() => { });
 
 async function populateDirectory(openDirectoryPicker = true) {
+  if (!fs) return;
+
   if (openDirectoryPicker) {
     store.$patch({ originalHandler: await fs.openDirectory() });
   }
 
-  const directoryStructure = await fs.buildDirectoryStructure(store.$state.originalHandler!);
-  const project = fs.populateDirectory(directoryStructure);
+  const directoryStructure = await fs.buildDirectoryStructure(store.$state.originalHandler as any);
+  const project = fsImpl.populateDirectory(directoryStructure);
 
   if (!project) return;
 
@@ -151,7 +157,7 @@ async function populateDirectory(openDirectoryPicker = true) {
 }
 
 async function executeUntrustedScripts() {
-  let userUntrustedFiles = fs.getAllFilesFromDirectory(store.$state.configDirectory!);
+  let userUntrustedFiles = fsImpl.getAllFilesFromDirectory(store.$state.configDirectory!);
 
   let userUntrustedModules = userUntrustedFiles.filter(file => file.name.endsWith(".mjs"))
     .map(({ text, webkitRelativePath }) => ({ text: text, webkitRelativePath }));
@@ -165,7 +171,7 @@ async function executeUntrustedScripts() {
 }
 
 async function saveFile() {
-  fs.saveFile(of.getLastOpenedFile()!.handler, await getProsemirrorText());
+  fsImpl.saveFile(of.getLastOpenedFile()!.handler, await getProsemirrorText());
 }
 
 async function reloadDirectoryStructure() {
@@ -173,9 +179,9 @@ async function reloadDirectoryStructure() {
 }
 
 async function showOrCreateExtension() {
-  if (!store.$state.configDirectory) {
-    const configDirectory = await fs.createNewDirectory(store.$state.originalHandler!, EXTENSION_STRUCTURE.EXTENSION_FOLDER);
-    await fs.createNewFile(configDirectory, EXTENSION_STRUCTURE.INDEX__JS.fileName, EXTENSION_STRUCTURE.INDEX__JS.content);
+  if (!store.$state.configDirectory && store.$state.originalHandler) {
+    const configDirectory = await fsImpl.createNewDirectory(store.$state.originalHandler as any, EXTENSION_STRUCTURE.EXTENSION_FOLDER);
+    await fsImpl.createNewFile(configDirectory, EXTENSION_STRUCTURE.INDEX__JS.fileName, EXTENSION_STRUCTURE.INDEX__JS.content);
     await populateDirectory(false);
   }
 
@@ -237,20 +243,24 @@ async function reopenFile(openedFileRelativePath: string) {
 
   fileKey.value = openedFileRelativePath;
 
-  let customFile = fs.findFileHandler(store.$state.directory!, openedFileRelativePath);
+  let customFile = fsImpl.findFileHandler(store.$state.directory!, openedFileRelativePath);
 
   fileValue.value = customFile;
 }
 
-function triggerWelcomeAction(type: WelcomeAction) {
+async function triggerWelcomeAction(type: WelcomeAction) {
   switch (type) {
     case 'tour':
+    fs = useFileSystem("inMemory");
       break;
     case 'openWorkspace':
+    fs = useFileSystem("physical");
       break;
     default:
       break;
   }
+
+  await populateDirectory(true);
 }
 
 async function triggerMenuAction(type: MenuAction, resource: CustomDirectory | CustomFile) {
@@ -283,8 +293,8 @@ async function triggerMenuAction(type: MenuAction, resource: CustomDirectory | C
 async function saveNewFileOrDirectory(directory: CustomDirectory, operation: ModalOperation, name: string) {
   if (!directory.handle) return;
 
-  if (operation == ModalOperation.FILE) await fs.createNewFile(directory.handle, name, "");
-  else if (operation == ModalOperation.DIRECTORY) await fs.createNewDirectory(directory.handle, name);
+  if (operation == ModalOperation.FILE) await fsImpl.createNewFile(directory.handle, name, "");
+  else if (operation == ModalOperation.DIRECTORY) await fsImpl.createNewDirectory(directory.handle, name);
 
   await populateDirectory(false);
 
@@ -302,7 +312,7 @@ async function renameResource(operation: ModalOperation, newResourceName: string
         ? of.getFile(resourceActionData.webkitRelativePath)!.handler
         : (resourceActionData as CustomFile).handle;
 
-      await fs.renameFile((resourceActionData as CustomFile).directoryHandle, (resourceActionData as CustomFile).name, newResourceName, await (await fileHandle.getFile()).text());
+      await fsImpl.renameFile((resourceActionData as CustomFile).directoryHandle, (resourceActionData as CustomFile).name, newResourceName, await (await fileHandle.getFile()).text());
     }
     else if (operation == ModalOperation.DIRECTORY) {
       showLoading.value = true;
@@ -311,16 +321,16 @@ async function renameResource(operation: ModalOperation, newResourceName: string
 
       let parentDirectory = parentResourceRelativePath.length == 1 && store.$state.directory?.webkitRelativePath == parentResourceRelativePath[0]
         ? store.$state.directory
-        : fs.findDirectoryHandler(store.$state.directory!, parentResourceRelativePath.join("/"));
+        : fsImpl.findDirectoryHandler(store.$state.directory!, parentResourceRelativePath.join("/"));
 
-      let oldDirectoryToDelete = fs.findDirectoryHandler(store.$state.directory!, resourceActionData.webkitRelativePath);
+      let oldDirectoryToDelete = fsImpl.findDirectoryHandler(store.$state.directory!, resourceActionData.webkitRelativePath);
 
-      await fs.renameDirectory(parentDirectory!.handle, (resourceActionData as CustomDirectory).handle, newResourceName);
+      await fsImpl.renameDirectory(parentDirectory!.handle, (resourceActionData as CustomDirectory).handle, newResourceName);
 
       await reloadDirectoryStructure();
 
       if (oldDirectoryToDelete)
-        await fs.deleteDirectory(parentDirectory!.handle, oldDirectoryToDelete.handle, true);
+        await fsImpl.deleteDirectory(parentDirectory!.handle, oldDirectoryToDelete.handle, true);
 
       showLoading.value = false;
     }
@@ -334,7 +344,7 @@ async function renameResource(operation: ModalOperation, newResourceName: string
 async function deleteResource(operation: ModalOperation) {
   if (resourceActionData) {
     if (operation == ModalOperation.FILE) {
-      await fs.deleteFile((resourceActionData as CustomFile).directoryHandle, (resourceActionData as CustomFile).name);
+      await fsImpl.deleteFile((resourceActionData as CustomFile).directoryHandle, (resourceActionData as CustomFile).name);
 
       of.deleteFile(resourceActionData.webkitRelativePath);
 
@@ -344,7 +354,7 @@ async function deleteResource(operation: ModalOperation) {
       }
     }
     else if (operation == ModalOperation.DIRECTORY) {
-      await fs.deleteDirectory(store.$state.originalHandler!, (resourceActionData as CustomDirectory).handle, true);
+      await fsImpl.deleteDirectory(store.$state.originalHandler as any, (resourceActionData as CustomDirectory).handle, true);
     }
   }
 
