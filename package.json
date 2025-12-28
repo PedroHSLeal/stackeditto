@@ -7,6 +7,7 @@
     "dev": "vite",
     "playground": "vite --mode playground",
     "build": "run-p type-check \"build-only {@}\" --",
+    "new-playground": "node scripts/new-playground/index.mjs",
     "preview": "vite preview",
     "test:unit": "vitest",
     "build-only": "vite build",
