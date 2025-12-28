@@ -1,12 +1,12 @@
 <template>
   <div style="width: 100vw; overflow: auto; height: 100vh">
     <h1>PG - Untrusted custom elements</h1>
-    <ProsemirrorEditor v-if="showEditor" :file-key="file" />
+    <ProsemirrorEditor v-if="showEditor" :value="file" />
   </div>
 </template>
 
 <script setup lang="ts">
-import ProsemirrorEditor from '@/components/ProsemirrorEditor.vue';
+import ProsemirrorEditor from '@/components/editors/prosemirror/Editor.vue';
 
 import { onBeforeMount, onMounted, shallowRef } from 'vue';
 import { useUntrustedScripts } from '@/services/untrusted-code-extensions/scripts';
