@@ -6,7 +6,7 @@ describe("(in-memory) file-system service suite", async () => {
   describe("openDirectory()", async () => {
     const { openDirectory } = useFileSystem();
 
-    it("should return a representation of the chosen directory", async () => {
+    test("should return a representation of the chosen directory", async () => {
       const structure: Structure = {
         name: "folder-1",
         kind: "directory",
@@ -84,6 +84,38 @@ describe("(in-memory) file-system service suite", async () => {
       const customDirectory = await buildDirectoryStructure(structure as any);
 
       expect(customDirectory).toBeUndefined();
+    });
+  });
+
+  describe("file handle operations", async () => {
+    test("read file content, write a new content and see the changed data in file handler", async () => {
+      const fs = useFileSystem();
+
+      const handler = await fs.openDirectory({
+        kind: "directory",
+        name: "folder-1",
+        children: [
+          {
+            kind: "file",
+            name: "file-1.md",
+            content: "before"
+          }
+        ]
+      });
+
+      const fileHandlerBefore = await handler!.getFileHandle("file-1.md");
+      const fileBefore = await fileHandlerBefore.getFile();
+      const fileContentBefore = await fileBefore.text();
+
+      const writable = await fileHandlerBefore.createWritable();
+      await writable.write("after");
+
+      const fileHandlerAfter = await handler!.getFileHandle("file-1.md");
+      const fileAfter = await fileHandlerAfter.getFile();
+      const fileContentAfter = await fileAfter.text();
+
+      console.log(fileContentBefore);
+      console.log(fileContentAfter);
     });
   });
 });
