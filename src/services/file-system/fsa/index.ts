@@ -1,5 +1,4 @@
-import { EXCLUDED_DIRECTORIES, type CustomDirectory, type CustomFile } from "@/models/file-system";
-import { EXTENSION_STRUCTURE } from "@/services/untrusted-code-extensions/constants/extension-structure";
+import { type CustomDirectory } from "@/models/file-system";
 import { useFileSystemManipulation } from "../utils";
 
 export function useFileSystem() {

@@ -1,12 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useFileSystem } from ".";
-import { useFileSystem as useInMemoryFileSystem } from "../in-memory";
-import { EXTENSION_STRUCTURE } from "@/services/untrusted-code-extensions";
-import type { Structure } from "../in-memory/json-structure";
+import { describe, expect, it } from "vitest";
+import { useFileSystem } from "../fsa";
+import { useFileSystem as useInMemoryFileSystem } from ".";
+import type { Structure } from "./json-structure";
 
 describe("file-system service suite", async () => {
   describe("buildDirectoryStructure()", async () => {
-    it.only("should return a representation of the chosen directory", async () => {
+    it("should return a representation of the chosen directory", async () => {
       const structure: Structure = {
         name: "folder-1",
         kind: "directory",
