@@ -79,7 +79,9 @@ export function useFileSystem() {
       },
       createWritable: async function (options: FileSystemCreateWritableOptions): Promise<FileSystemWritableFileStream> {
         return {
-          write: async function (data: FileSystemWriteChunkType) { },
+          write: async function (data: FileSystemWriteChunkType) {
+            args.content = [data.toString()];
+          },
           close: async function () { }
         } as FileSystemWritableFileStream;
       },

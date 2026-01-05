@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 import { useFileSystem } from ".";
 import type { Structure } from "./json-structure";
 
@@ -42,10 +42,48 @@ describe("(in-memory) file-system service suite", async () => {
       expect(fileContent).toBe(expectFileHandle.content);
     });
 
-    it.each([null, undefined, {}])("should return empty when the provided structure is nullable (%s)", async (structure) => {
+    test.each([null, undefined, {}])("should return empty when the provided structure is nullable (%s)", async (structure) => {
       const handler = await openDirectory(structure as any);
 
       expect(handler).toBeUndefined();
+    });
+  });
+
+  describe("buildDirectoryStructure()", async () => {
+    const { openDirectory, buildDirectoryStructure } = useFileSystem();
+
+    test("should return a custom directory structure", async () => {
+      const structure: Structure = {
+        name: "folder-1",
+        kind: "directory",
+        children: [
+          {
+            kind: "file",
+            name: "file-1.md",
+            content: ""
+          }
+        ]
+      };
+
+      const customDirectory = await buildDirectoryStructure(await openDirectory(structure));
+
+      const expectedCustomDirectory = {
+        webkitRelativePath: "folder-1",
+        directories: [],
+        files: [
+          { webkitRelativePath: "folder-1/file-1.md" }
+        ],
+      };
+
+      expect(customDirectory!.handle).not.toBeUndefined();
+      expect(customDirectory!.directories).toHaveLength(0);
+      expect(customDirectory!.files[0].webkitRelativePath).toBe(expectedCustomDirectory.files[0].webkitRelativePath);
+    });
+
+    test.each([null, undefined])("should return empty when the provided handler is nullable (%s)", async (structure) => {
+      const customDirectory = await buildDirectoryStructure(structure as any);
+
+      expect(customDirectory).toBeUndefined();
     });
   });
 });
