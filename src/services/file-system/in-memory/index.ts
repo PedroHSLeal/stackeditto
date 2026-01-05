@@ -1,14 +1,13 @@
 import { useFileSystemManipulation } from "../utils";
 import { traverseStructure, type Structure } from "./json-structure";
 
-type DirectoryHandleArgs = {
-  name: string;
-}
-
 export function useFileSystem() {
   const { getFiles } = useFileSystemManipulation();
 
-  async function openDirectory(json: Structure): Promise<FileSystemDirectoryHandle> {
+  async function openDirectory(json: Structure | null | undefined): Promise<FileSystemDirectoryHandle | undefined> {
+    if (!json) return Promise.resolve(undefined);
+    if (typeof json == "object" && Object.keys(json).length == 0) return Promise.resolve(undefined);
+
     return Promise.resolve(createDirectoryHandle({ name: json.name, children: traverseStructure(json, createDirectoryHandle, createFileHandle) }));
   }
 
@@ -57,15 +56,14 @@ export function useFileSystem() {
         }
       },
       getFileHandle: async function (name: string, options?: FileSystemGetFileOptions): Promise<FileSystemFileHandle> {
-        if (options?.create)
-          return createFileHandle({ name, content: [""] })
-        else {
-          const found = args.children[name];
+        const file = args.children[name];
 
-          if (!found) throw new DOMException("", "NotFoundError");
-          else if (found.kind == "directory") throw new DOMException("", "TypeMismatchError");
-          else return found;
-        }
+        if (!file && !!options?.create) throw new DOMException("", "NotFoundError");
+        if (file.kind == "directory") throw new DOMException("", "TypeMismatchError");
+        if (options?.create) return createFileHandle({ name, content: [""] })
+
+        return file;
+
       },
     } as FileSystemDirectoryHandle;
   }

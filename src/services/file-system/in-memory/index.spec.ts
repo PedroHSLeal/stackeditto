@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { useFileSystem } from "../fsa";
-import { useFileSystem as useInMemoryFileSystem } from ".";
+import { useFileSystem } from ".";
 import type { Structure } from "./json-structure";
 
-describe("file-system service suite", async () => {
-  describe("buildDirectoryStructure()", async () => {
+describe("(in-memory) file-system service suite", async () => {
+  describe("openDirectory()", async () => {
+    const { openDirectory } = useFileSystem();
+
     it("should return a representation of the chosen directory", async () => {
       const structure: Structure = {
         name: "folder-1",
@@ -18,30 +19,33 @@ describe("file-system service suite", async () => {
         ]
       };
 
-      const handler = await useInMemoryFileSystem().openDirectory(structure);
+      const handler = await openDirectory(structure);
+      const file = await handler!.getFileHandle(structure.children[0].name);
+      const fileContent = await (await file.getFile()).text();
 
-      const expectCustomDirectory = {
-        webkitRelativePath: "folder-1",
-        files: [
-          {
-            webkitRelativePath: "folder-1/file-1.md"
-          }
-        ]
+      const expectDirectoryHandle = {
+        name: "folder-1",
+        kind: "directory"
       };
 
-      const { buildDirectoryStructure } = useFileSystem();
+      expect(handler!.name).toBe(expectDirectoryHandle.name);
+      expect(handler!.kind).toBe(expectDirectoryHandle.kind);
 
-      const customDirectory = await buildDirectoryStructure(handler);
+      const expectFileHandle = {
+        name: "file-1.md",
+        kind: "file",
+        content: ""
+      }
 
-      expect(customDirectory?.webkitRelativePath).toBe(expectCustomDirectory.webkitRelativePath);
-      expect(customDirectory?.files[0].webkitRelativePath).toBe(expectCustomDirectory.files[0].webkitRelativePath);
+      expect(file.name).toBe(expectFileHandle.name);
+      expect(file.kind).toBe(expectFileHandle.kind);
+      expect(fileContent).toBe(expectFileHandle.content);
     });
-    it("should return undefined if the handler is undefined", async () => {
-      const { buildDirectoryStructure } = useFileSystem();
 
-      const customDirectory = await buildDirectoryStructure(undefined);
+    it.each([null, undefined, {}])("should return empty when the provided structure is nullable (%s)", async (structure) => {
+      const handler = await openDirectory(structure as any);
 
-      expect(customDirectory).toBeUndefined();
+      expect(handler).toBeUndefined();
     });
   });
 });
