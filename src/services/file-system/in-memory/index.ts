@@ -45,15 +45,13 @@ export function useFileSystem() {
         }
       },
       getDirectoryHandle: async function (name: string, options?: FileSystemGetDirectoryOptions): Promise<FileSystemDirectoryHandle> {
-        if (options?.create)
-          return createDirectoryHandle({ name, children: {} })
-        else {
-          const found = args.children[name];
+        const directory = args.children[name];
 
-          if (!found) throw new DOMException("", "NotFoundError");
-          else if (found.kind == "file") throw new DOMException("", "TypeMismatchError");
-          else return found;
-        }
+        if (!directory && !!options?.create) throw new DOMException("", "NotFoundError");
+        if (directory.kind == "file") throw new DOMException("", "TypeMismatchError");
+        if (options?.create) return createDirectoryHandle({ name, children: [] })
+
+        return directory;
       },
       getFileHandle: async function (name: string, options?: FileSystemGetFileOptions): Promise<FileSystemFileHandle> {
         const file = args.children[name];
