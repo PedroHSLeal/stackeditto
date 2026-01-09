@@ -20,7 +20,7 @@ describe("file-system manipulation", async () => {
   describe("getFiles()", async () => {
     const { getFiles } = useFileSystemManipulation();
 
-    test.only("should convert the file-system directory and turn into a CustomDirectory structure", async () => {
+    test("should convert the file-system directory and turn into a CustomDirectory structure", async () => {
       jsonStructure = {
         kind: "directory",
         name: "folder-1",
@@ -38,6 +38,11 @@ describe("file-system manipulation", async () => {
       const customDirectory = await getFiles(directoryHandle!, { handle: directoryHandle!, webkitRelativePath: directoryHandle!.name, directories: [], files: [] });
 
       expect(customDirectory).toBeDefined();
-    })
+    });
+    /* test.each([null, undefined])("should return undefined when the provided directoryHandle is %p", async (providedValue) => {
+      const customDirectory = await getFiles(providedValue!, { handle: directoryHandle!, webkitRelativePath: directoryHandle!.name, directories: [], files: [] });
+
+      expect(customDirectory).toBeDefined();
+    }); */
   })
 })
