@@ -1,5 +1,5 @@
 import { EXCLUDED_DIRECTORIES, type CustomDirectory, type CustomFile } from "@/models/file-system";
-import { EXTENSION_STRUCTURE } from "../untrusted-code-extensions";
+import { EXTENSION_STRUCTURE } from "../../untrusted-code-extensions";
 
 export function useFileSystemManipulation() {
   async function getFiles(dirHandle: FileSystemDirectoryHandle, tree: CustomDirectory, path = dirHandle.name): Promise<CustomDirectory> {
@@ -142,7 +142,6 @@ export function useFileSystemManipulation() {
     }
   }
 
-  // UTILS
   function getAllFilesFromDirectory(directory: CustomDirectory): CustomFile[] {
     let files: CustomFile[] = [];
 

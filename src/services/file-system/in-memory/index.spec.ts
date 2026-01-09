@@ -113,9 +113,6 @@ describe("(in-memory) file-system service suite", async () => {
       const fileHandlerAfter = await handler!.getFileHandle("file-1.md");
       const fileAfter = await fileHandlerAfter.getFile();
       const fileContentAfter = await fileAfter.text();
-
-      console.log(fileContentBefore);
-      console.log(fileContentAfter);
     });
   });
 });
