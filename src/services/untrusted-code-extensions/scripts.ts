@@ -7,15 +7,17 @@ export function useUntrustedScripts() {
   }
 
   async function executeUntrustedScript(userScripts: Promise<string>[]) {
-   Promise.all(userScripts)
-    .then(files => Promise.all(files.map(f => {
-      return loadUntrustedScript(
-        `return async function(registerHtmlBlock, getModule) { \n ${f} \n }`,
+    const scripts = await Promise.all(userScripts);
+    for (const script of scripts) {
+      let t = script.split("\n").filter(f => !f.startsWith("//")).join("\n");
+
+      loadUntrustedScript(
+        `return async function(registerHtmlBlock, getModule) { \n ${t} \n }`,
         registerUntrustedHtmlBlock,
         getModule
       );
-    })))
-    .catch(error => console.error(error));
+    }
+
   }
 
   return {
