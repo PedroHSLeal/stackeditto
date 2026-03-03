@@ -1,7 +1,7 @@
 import type { Decoration, DecorationSource, EditorView, NodeView } from "prosemirror-view"
 import type { Node } from "prosemirror-model"
 
-import { getUntrustedHtmlBlock } from "@/services/untrusted-code-extensions/registry/html-blocks"
+import { getUntrustedHtmlBlock } from "@/services/untrusted-code-extensions/registry/html-blocks";
 
 export class HtmlBlockView implements NodeView {
   dom: InstanceType<typeof window.Node>;

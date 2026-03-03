@@ -30,7 +30,7 @@ onMounted(() => {
   stopPropagationEventsInContainer();
 
   if (refEditor.value) {
-    createMonacoEditor(refEditor.value);
+    editor = createMonacoEditor(refEditor.value);
     addJavascriptConfiguration();
 
     if (editor) {
@@ -60,7 +60,7 @@ watch(() => props.size, (newSize) => {
 });
 
 function createMonacoEditor(htmlElement: HTMLElement) {
-  editor = monacoEditor.editor.create(htmlElement, {
+  return monacoEditor.editor.create(htmlElement, {
     language: fileFormatMap.get(props.extension),
     largeFileOptimizations: true,
     lineNumbers: "on",
