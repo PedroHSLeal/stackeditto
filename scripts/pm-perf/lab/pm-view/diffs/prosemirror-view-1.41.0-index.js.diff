@@ -1,0 +1,114 @@
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1370,8 +1370,12 @@
+         let composition = view.composing ? this.localCompositionInfo(view, pos) : null;
+         let localComposition = composition && composition.pos > -1 ? composition : null;
+         let compositionInChild = composition && composition.pos < 0;
+-        let updater = new ViewTreeUpdater(this, localComposition && localComposition.node, view);
+-        iterDeco(this.node, this.innerDeco, (widget, i, insideNode) => {
++        // Fast path for big block containers without decorations: nodes (and
++        // descs) at the start and end that are identical to the previous
++        // version are neither matched nor visited.
++        let fast = !inline && !composition && this.node.childCount >= FAST_UPDATE_MIN ? unchangedEnds(this) : null;
++        let updater = new ViewTreeUpdater(this, localComposition && localComposition.node, view, fast ? fast.preMatch : undefined);
++        let onWidget = (widget, i, insideNode) => {
+             if (widget.spec.marks)
+                 updater.syncToMarks(widget.spec.marks, inline, view);
+             else if (widget.type.side >= 0 && !insideNode)
+@@ -1379,7 +1383,8 @@
+             // If the next node is a desc matching this widget, reuse it,
+             // otherwise insert the widget as a new view desc.
+             updater.placeWidget(widget, view, off);
+-        }, (child, outerDeco, innerDeco, i) => {
++        };
++        let onNode = (child, outerDeco, innerDeco, i) => {
+             // Make sure the wrapping mark descs match the node's marks.
+             updater.syncToMarks(child.marks, inline, view);
+             // Try several strategies for drawing this node
+@@ -1395,7 +1400,20 @@
+                 updater.addNode(child, outerDeco, innerDeco, view, off);
+             }
+             off += child.nodeSize;
+-        });
++        };
++        if (fast) {
++            let locals = this.innerDeco.locals(this.node);
++            updater.index = fast.start;
++            off = pos + fast.startOff;
++            for (let i = fast.start; i < fast.end; i++) {
++                let child = this.node.child(i);
++                onNode(child, locals, this.innerDeco.forChild(off - pos, child), i);
++            }
++            updater.skipMatchedSuffix(fast.suffix);
++        }
++        else {
++            iterDeco(this.node, this.innerDeco, onWidget, onNode);
++        }
+         // Drop all remaining descs after the current position.
+         updater.syncToMarks([], inline, view);
+         if (this.node.isTextblock)
+@@ -1756,7 +1774,7 @@
+ // Helper class for incrementally updating a tree of mark descs and
+ // the widget and node descs inside of them.
+ class ViewTreeUpdater {
+-    constructor(top, lock, view) {
++    constructor(top, lock, view, preMatchOverride) {
+         this.lock = lock;
+         this.view = view;
+         // Index into `this.top`'s child array, represents the current
+@@ -1768,7 +1786,14 @@
+         // Tracks whether anything was changed
+         this.changed = false;
+         this.top = top;
+-        this.preMatch = preMatch(top.node.content, top);
++        this.preMatch = preMatchOverride || preMatch(top.node.content, top);
++    }
++    // Used by the updateChildren fast path: the `count` trailing child
++    // descs are known to match the trailing nodes, so drop whatever is
++    // left between the current index and them and jump over them.
++    skipMatchedSuffix(count) {
++        this.destroyBetween(this.index, this.top.children.length - count);
++        this.index = this.top.children.length;
+     }
+     // Destroy and remove the children between the given indices in
+     // `this.top`.
+@@ -2002,6 +2027,39 @@
+ // for other nodes. Returns the fragment index of the first node that
+ // is part of the sequence of matched nodes at the end of the
+ // fragment.
++const FAST_UPDATE_MIN = 64;
++// For a block container whose child descs map one-to-one onto its
++// children (no marks, widgets or decorations), find how many leading and
++// trailing children are identical to what is already drawn.
++function unchangedEnds(desc) {
++    let node = desc.node, kids = desc.children, n = node.childCount, m = kids.length;
++    let empty = DecorationSet.empty;
++    if (desc.innerDeco != empty)
++        return null;
++    let lim = Math.min(n, m), start = 0, startOff = 0, suffix = 0;
++    for (; start < lim; start++) {
++        let d = kids[start], c = node.child(start);
++        if (!(d instanceof NodeViewDesc) || d.node !== c || d.dirty != NOT_DIRTY || d.outerDeco.length || d.innerDeco != empty)
++            break;
++        startOff += c.nodeSize;
++    }
++    for (; start + suffix < lim; suffix++) {
++        let d = kids[m - 1 - suffix], c = node.child(n - 1 - suffix);
++        if (!(d instanceof NodeViewDesc) || d.node !== c || d.dirty != NOT_DIRTY || d.outerDeco.length || d.innerDeco != empty)
++            break;
++    }
++    // Everything between the two ends has to be descs of this node too
++    // (no widgets or marks), or the one-to-one mapping doesn't hold.
++    for (let i = start; i < m - suffix; i++)
++        if (!(kids[i] instanceof NodeViewDesc))
++            return null;
++    // updateNextNode/findNodeMatch only ever look at the first few
++    // trailing descs, so the lookup table only needs those.
++    let end = n - suffix, matched = new Map;
++    for (let i = 0; i < Math.min(suffix, 8); i++)
++        matched.set(kids[m - suffix + i], end + i);
++    return { start, startOff, end, suffix, preMatch: { index: end, matched, matches: [] } };
++}
+ function preMatch(frag, parentDesc) {
+     let curDesc = parentDesc, descI = curDesc.children.length;
+     let fI = frag.childCount, matched = new Map, matches = [];

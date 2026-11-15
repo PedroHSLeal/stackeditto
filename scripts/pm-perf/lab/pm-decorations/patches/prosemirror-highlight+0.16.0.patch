@@ -1,0 +1,170 @@
+diff --git a/node_modules/prosemirror-highlight/dist/index.js b/node_modules/prosemirror-highlight/dist/index.js
+index 47ae6a1..239cd9a 100644
+--- a/node_modules/prosemirror-highlight/dist/index.js
++++ b/node_modules/prosemirror-highlight/dist/index.js
+@@ -78,12 +78,13 @@ var DecorationCache = class DecorationCache {
+ */
+ function createHighlightPlugin({ parser, nodeTypes = ["code_block", "codeBlock"], languageExtractor = (node) => node.attrs.language }) {
+ 	const key = new PluginKey("prosemirror-highlight");
++	const parsed = /* @__PURE__ */ new WeakMap();
+ 	return new Plugin({
+ 		key,
+ 		state: {
+ 			init(_, instance) {
+ 				const cache = new DecorationCache();
+-				const [decorations, promises] = calculateDecoration(instance.doc, parser, nodeTypes, languageExtractor, cache);
++				const [decorations, promises] = calculateDecoration(instance.doc, parser, nodeTypes, languageExtractor, parsed);
+ 				return {
+ 					cache,
+ 					decorations,
+@@ -91,16 +92,23 @@ function createHighlightPlugin({ parser, nodeTypes = ["code_block", "codeBlock"]
+ 				};
+ 			},
+ 			apply: (tr, data) => {
+-				const cache = data.cache.invalidate(tr);
+ 				const refresh = !!tr.getMeta("prosemirror-highlight-refresh");
+ 				if (!tr.docChanged && !refresh) return {
+-					cache,
++					cache: data.cache,
+ 					decorations: data.decorations?.map(tr.mapping, tr.doc),
+ 					promises: data.promises
+ 				};
+-				const [decorations, promises] = calculateDecoration(tr.doc, parser, nodeTypes, languageExtractor, cache);
++				if (!refresh) {
++					const updated = updateDecorations(tr, data, parser, nodeTypes, languageExtractor, parsed);
++					if (updated) return {
++						cache: data.cache,
++						decorations: updated.set == DecorationSet.empty ? void 0 : updated.set,
++						promises: updated.promises
++					};
++				}
++				const [decorations, promises] = calculateDecoration(tr.doc, parser, nodeTypes, languageExtractor, parsed);
+ 				return {
+-					cache,
++					cache: data.cache,
+ 					decorations,
+ 					promises
+ 				};
+@@ -136,37 +144,100 @@ function createHighlightPlugin({ parser, nodeTypes = ["code_block", "codeBlock"]
+ 		} }
+ 	});
+ }
+-function calculateDecoration(doc, parser, nodeTypes, languageExtractor, cache) {
++// ---- pm-perf patch: incremental update of the highlight decorations ----
++// Parsed output is cached per Node object (structural sharing keeps unchanged blocks identical across transactions, and
++// undo/redo/move bring old Node objects back), as [pos the decorations were computed for, decorations].
++function parseCodeBlock(node, pos, parser, languageExtractor, parsed, promises) {
++  const hit = parsed.get(node);
++  if (hit) {
++    const delta = pos - hit[0];
++    if (delta) {
++      const shifted = new Array(hit[1].length);
++      for (let i = 0; i < shifted.length; i++) shifted[i] = hit[1][i].copy(hit[1][i].from + delta, hit[1][i].to + delta);
++      hit[0] = pos;
++      hit[1] = shifted;
++    }
++    return hit[1];
++  }
++  const result = parser({
++    content: node.textContent,
++    language: languageExtractor(node) || void 0,
++    pos,
++    size: node.nodeSize
++  });
++  if (result && Array.isArray(result)) {
++    parsed.set(node, [pos, result]);
++    return result;
++  }
++  if (result instanceof Promise) promises.push(result);
++  else console.error(`[prosemirror-highlight] Invalid parser result:`, result);
++  return null;
++}
++// Appends without `push(...array)`: spreading a few hundred thousand decorations overflows the call stack.
++function appendAll(target, source) {
++  for (let i = 0; i < source.length; i++) target.push(source[i]);
++}
++function updateDecorations(tr, data, parser, nodeTypes, languageExtractor, parsed) {
++  const maps = tr.mapping.maps;
++  const ranges = [];
++  for (let i = 0; i < maps.length; i++) {
++    maps[i].forEach((_oldStart, _oldEnd, newStart, newEnd) => {
++      const rest = tr.mapping.slice(i + 1);
++      ranges.push(rest.map(newStart, -1), rest.map(newEnd, 1));
++    });
++  }
++  // Huge edits (replace all, big paste) are cheaper to recompute from scratch.
++  if (ranges.length > 128) return null;
++  const doc = tr.doc;
++  const blocks = /* @__PURE__ */ new Map();
++  for (let i = 0; i < ranges.length; i += 2) {
++    const from = Math.max(0, ranges[i]);
++    const to = Math.min(doc.content.size, ranges[i + 1]);
++    if (from > to) continue;
++    doc.nodesBetween(from, to, (node, pos) => {
++      if (node.isTextblock) {
++        blocks.set(pos, node);
++        return false;
++      }
++      return true;
++    });
++  }
++  // Re-tokenizing + find/remove/add inside one enormous block costs more than rebuilding the whole set (whose other
++  // blocks come from the parsed cache), so leave those edits to the full path.
++  for (const node of blocks.values()) if (node.content.size > 20000) return null;
++  let set = data.decorations ? data.decorations.map(tr.mapping, doc) : DecorationSet.empty;
++  const promises = [];
++  const stale = [];
++  const fresh = [];
++  for (const [pos, node] of blocks) {
++    const end = pos + node.nodeSize;
++    // Decorations that map() kept in a block that changed (or stopped being a code block) are dropped, including ones
++    // that now straddle a block boundary (a token cut in two by a split). find() also returns decorations that merely
++    // touch the range (a neighbour's node decoration ends at `pos`), hence the strict overlap filter.
++    const inside = set.find(pos, end);
++    for (let i = 0; i < inside.length; i++) if (inside[i].from < end && inside[i].to > pos) stale.push(inside[i]);
++    if (nodeTypes.includes(node.type.name)) {
++      const decorations = parseCodeBlock(node, pos, parser, languageExtractor, parsed, promises);
++      if (decorations) appendAll(fresh, decorations);
++    }
++  }
++  if (stale.length) set = set.remove(stale);
++  if (fresh.length) set = set.add(doc, fresh);
++  return { set, promises };
++}
++function calculateDecoration(doc, parser, nodeTypes, languageExtractor, parsed) {
+ 	const allDecorations = [];
+ 	const promises = [];
+ 	const nodes = collectCodeBlocks(doc, nodeTypes);
+ 	try {
+ 		for (const [node, pos] of nodes) {
+-			const language = languageExtractor(node);
+-			const cached = cache.get(pos);
+-			if (cached) {
+-				const [_, decorations] = cached;
+-				if (decorations.length > 0) allDecorations.push(decorations);
+-			} else {
+-				const parsed = parser({
+-					content: node.textContent,
+-					language: language || void 0,
+-					pos,
+-					size: node.nodeSize
+-				});
+-				if (parsed && Array.isArray(parsed)) {
+-					cache.set(pos, node, parsed);
+-					if (parsed.length > 0) allDecorations.push(parsed);
+-				} else if (parsed instanceof Promise) {
+-					cache.remove(pos);
+-					promises.push(parsed);
+-				} else console.error(`[prosemirror-highlight] Invalid parser result:`, parsed);
+-			}
++			const decorations = parseCodeBlock(node, pos, parser, languageExtractor, parsed, promises);
++			if (decorations) appendAll(allDecorations, decorations);
+ 		}
+ 	} catch (error) {
+ 		console.error(`[prosemirror-highlight] Error parsing code blocks:`, error);
+ 	}
+-	return [allDecorations.length > 0 ? DecorationSet.create(doc, allDecorations.flat()) : void 0, promises];
++	return [allDecorations.length > 0 ? DecorationSet.create(doc, allDecorations) : void 0, promises];
+ }
+ function collectCodeBlocks(doc, nodeTypes) {
+ 	const nodes = [];

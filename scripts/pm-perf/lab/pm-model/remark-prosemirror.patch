@@ -1,0 +1,81 @@
+--- a/node_modules/@handlewithcare/remark-prosemirror/lib/mdast-util-to-prosemirror.js
++++ b/node_modules/@handlewithcare/remark-prosemirror/lib/mdast-util-to-prosemirror.js
+@@ -1,7 +1,6 @@
+ import { fromHtml } from "hast-util-from-html";
+ import { Fragment } from "prosemirror-model";
+ import { trimLines } from "trim-lines";
+-import { visit } from "unist-util-visit";
+ import { zwitch } from "zwitch";
+ export function createState(schema, handlers, htmlHandlers, tree) {
+     const definitionById = new Map();
+@@ -15,7 +14,15 @@
+         footnoteOrder: [],
+         one
+     };
+-    visit(tree, function(node) {
++    // Iterative pre-order walk (same visiting order as unist-util-visit, without its per-node closure/defineProperty cost)
++    const stack = [
++        tree
++    ];
++    while(stack.length){
++        const node = stack.pop();
++        if (node.children) {
++            for(let i = node.children.length - 1; i >= 0; i--)stack.push(node.children[i]);
++        }
+         if (node.type === "definition" || node.type === "footnoteDefinition") {
+             const map = node.type === "definition" ? definitionById : footnoteById;
+             const id = String(node.identifier).toUpperCase();
+@@ -26,12 +33,14 @@
+                 map.set(id, node);
+             }
+         }
+-    });
++    }
++    // The dispatcher only depends on schema/handlers, so it is built once instead of once per node.
++    const dispatch = createDispatch(schema, handlers, htmlHandlers);
+     return state;
+     /**
+    * Transform an mdast node into a hast node.
+    */ function one(node, parent) {
+-        return handle(schema, handlers, htmlHandlers, node, parent, state);
++        return dispatch(node, parent, state);
+     }
+     /**
+    * Transform the children of an mdast node into hast nodes.
+@@ -139,8 +148,8 @@
+     });
+     return zwitcher(node, parent, state);
+ }
+-function handle(schema, handlers, htmlHandlers, node, parent, state) {
+-    const zwitcher = zwitch("type", {
++function createDispatch(schema, handlers, htmlHandlers) {
++    return zwitch("type", {
+         invalid,
+         unknown,
+         handlers: {
+@@ -153,7 +162,7 @@
+                 const result = schema.topNodeType.create(null, children);
+                 return result;
+             },
+-            html (node) {
++            html (node, _, state) {
+                 const hastRoot = fromHtml(node.value);
+                 const html = hastRoot.children[0];
+                 if (html?.type !== "element") return null;
+@@ -190,7 +199,6 @@
+             }
+         }
+     });
+-    return zwitcher(node, parent, state);
+ }
+ export function toPmNode(nodeType, getAttrs) {
+     return (node, _, state)=>{
+@@ -207,7 +215,7 @@
+     };
+ }
+ export const toProseMirror = function(tree, options) {
+-    const doc = handle(options.schema, options.handlers, options.htmlHandlers ?? {}, tree, undefined, createState(options.schema, options.handlers, options.htmlHandlers ?? {}, tree));
++    const doc = createState(options.schema, options.handlers, options.htmlHandlers ?? {}, tree).one(tree, undefined);
+     doc.check();
+     return doc;
+ };

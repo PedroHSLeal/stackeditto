@@ -1,0 +1,111 @@
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -1331,18 +1331,32 @@
+       var composition = view.composing ? this.localCompositionInfo(view, pos) : null;
+       var localComposition = composition && composition.pos > -1 ? composition : null;
+       var compositionInChild = composition && composition.pos < 0;
+-      var updater = new ViewTreeUpdater(this, localComposition && localComposition.node, view);
+-      iterDeco(this.node, this.innerDeco, function (widget, i, insideNode) {
++      var fast = !inline && !composition && this.node.childCount >= FAST_UPDATE_MIN ? unchangedEnds(this) : null;
++      var updater = new ViewTreeUpdater(this, localComposition && localComposition.node, view, fast ? fast.preMatch : undefined);
++      var onWidget = function onWidget(widget, i, insideNode) {
+         if (widget.spec.marks) updater.syncToMarks(widget.spec.marks, inline, view);else if (widget.type.side >= 0 && !insideNode) updater.syncToMarks(i == _this6.node.childCount ? prosemirrorModel.Mark.none : _this6.node.child(i).marks, inline, view);
+         updater.placeWidget(widget, view, off);
+-      }, function (child, outerDeco, innerDeco, i) {
++      };
++      var onNode = function onNode(child, outerDeco, innerDeco, i) {
+         updater.syncToMarks(child.marks, inline, view);
+         var compIndex;
+         if (updater.findNodeMatch(child, outerDeco, innerDeco, i)) ;else if (compositionInChild && view.state.selection.from > off && view.state.selection.to < off + child.nodeSize && (compIndex = updater.findIndexWithChild(composition.node)) > -1 && updater.updateNodeAt(child, outerDeco, innerDeco, compIndex, view)) ;else if (updater.updateNextNode(child, outerDeco, innerDeco, view, i, off)) ;else {
+           updater.addNode(child, outerDeco, innerDeco, view, off);
+         }
+         off += child.nodeSize;
+-      });
++      };
++      if (fast) {
++        var locals = this.innerDeco.locals(this.node);
++        updater.index = fast.start;
++        off = pos + fast.startOff;
++        for (var _i = fast.start; _i < fast.end; _i++) {
++          var _child = this.node.child(_i);
++          onNode(_child, locals, this.innerDeco.forChild(off - pos, _child), _i);
++        }
++        updater.skipMatchedSuffix(fast.suffix);
++      } else {
++        iterDeco(this.node, this.innerDeco, onWidget, onNode);
++      }
+       updater.syncToMarks([], inline, view);
+       if (this.node.isTextblock) updater.addTextblockHacks();
+       updater.destroyRest();
+@@ -1754,7 +1768,7 @@
+   return next;
+ }
+ var ViewTreeUpdater = function () {
+-  function ViewTreeUpdater(top, lock, view) {
++  function ViewTreeUpdater(top, lock, view, preMatchOverride) {
+     _classCallCheck(this, ViewTreeUpdater);
+     this.lock = lock;
+     this.view = view;
+@@ -1762,9 +1776,15 @@
+     this.stack = [];
+     this.changed = false;
+     this.top = top;
+-    this.preMatch = preMatch(top.node.content, top);
++    this.preMatch = preMatchOverride || preMatch(top.node.content, top);
+   }
+   _createClass(ViewTreeUpdater, [{
++    key: "skipMatchedSuffix",
++    value: function skipMatchedSuffix(count) {
++      this.destroyBetween(this.index, this.top.children.length - count);
++      this.index = this.top.children.length;
++    }
++  }, {
+     key: "destroyBetween",
+     value: function destroyBetween(start, end) {
+       if (start == end) return;
+@@ -1980,6 +2000,45 @@
+   }]);
+   return ViewTreeUpdater;
+ }();
++var FAST_UPDATE_MIN = 64;
++function unchangedEnds(desc) {
++  var node = desc.node,
++    kids = desc.children,
++    n = node.childCount,
++    m = kids.length;
++  var empty = DecorationSet.empty;
++  if (desc.innerDeco != empty) return null;
++  var lim = Math.min(n, m),
++    start = 0,
++    startOff = 0,
++    suffix = 0;
++  for (; start < lim; start++) {
++    var d = kids[start],
++      c = node.child(start);
++    if (!(d instanceof NodeViewDesc) || d.node !== c || d.dirty != NOT_DIRTY || d.outerDeco.length || d.innerDeco != empty) break;
++    startOff += c.nodeSize;
++  }
++  for (; start + suffix < lim; suffix++) {
++    var _d = kids[m - 1 - suffix],
++      _c = node.child(n - 1 - suffix);
++    if (!(_d instanceof NodeViewDesc) || _d.node !== _c || _d.dirty != NOT_DIRTY || _d.outerDeco.length || _d.innerDeco != empty) break;
++  }
++  for (var i = start; i < m - suffix; i++) if (!(kids[i] instanceof NodeViewDesc)) return null;
++  var end = n - suffix,
++    matched = new Map();
++  for (var _i2 = 0; _i2 < Math.min(suffix, 8); _i2++) matched.set(kids[m - suffix + _i2], end + _i2);
++  return {
++    start: start,
++    startOff: startOff,
++    end: end,
++    suffix: suffix,
++    preMatch: {
++      index: end,
++      matched: matched,
++      matches: []
++    }
++  };
++}
+ function preMatch(frag, parentDesc) {
+   var curDesc = parentDesc,
+     descI = curDesc.children.length;

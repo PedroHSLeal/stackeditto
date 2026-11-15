@@ -1,0 +1,19 @@
+# Cópias de pacotes do npm (originais e patcheadas) usadas pelos testes de
+# equivalência e benchmarks: regenere com `npm pack <pacote>@<versão>` e/ou os
+# make-patch*.mjs de cada pasta.
+pm-decorations/builds/
+impl-view/orig-pv/
+impl-highlight/pristine/
+impl-remark/orig/
+pm-model/orig/
+pm-model/clean/
+pm-model/lab/
+pm-model/remark-pm/
+pm-model/remark-pm-orig/
+pm-view/patched/
+pm-view/patched-debug/
+
+# Binários compilados (fontes em wasm/mdrs e wasm/srch) e saídas brutas
+*.wasm
+*.jsonl
+pm-decorations/out/

@@ -1,0 +1,164 @@
+// ---- pm-perf patch: sweep-based span lookup (ES5-style so it is valid in both index.js and index.cjs) ----
+var SWEEP_MIN = __SWEEP_MIN__;
+// Finds the spans strictly inside (offset, end). Same result and order as the linear scan in
+// takeSpansForNode, but O(log d + k) per call instead of O(d).
+function SpanTaker(spans) {
+  var n = spans.length, from = new Float64Array(n), sorted = true, i;
+  for (i = 0; i < n; i++) {
+    var s = spans[i];
+    from[i] = s ? s.from : Infinity;
+    if (i && from[i] < from[i - 1]) sorted = false;
+  }
+  this.spans = spans;
+  if (sorted) {
+    this.order = null;
+    this.sf = from;
+  } else {
+    var order = new Array(n);
+    for (i = 0; i < n; i++) order[i] = i;
+    order.sort(function (a, b) { return from[a] - from[b] || a - b; });
+    var sf = new Float64Array(n);
+    for (i = 0; i < n; i++) sf[i] = from[order[i]];
+    this.order = order;
+    this.sf = sf;
+  }
+}
+SpanTaker.prototype.takeRange = function (offset, end) {
+  var sf = this.sf, spans = this.spans, order = this.order, n = sf.length;
+  var lo = 0, hi = n;
+  while (lo < hi) {
+    var mid = (lo + hi) >> 1;
+    if (sf[mid] > offset) hi = mid; else lo = mid + 1;
+  }
+  var idx = null;
+  for (var k = lo; k < n && sf[k] < end; k++) {
+    var i = order ? order[k] : k, span = spans[i];
+    if (span && span.to < end) (idx || (idx = [])).push(i);
+  }
+  if (!idx) return null;
+  if (order) idx.sort(function (a, b) { return a - b; });
+  var found = new Array(idx.length);
+  for (var j = 0; j < idx.length; j++) {
+    found[j] = spans[idx[j]];
+    spans[idx[j]] = null;
+  }
+  return found;
+};
+function makeTaker(spans, childCount) {
+  return spans.length * childCount > SWEEP_MIN ? new SpanTaker(spans) : null;
+}
+function takeSpans(taker, spans, node, offset) {
+  if (!taker) return takeSpansForNode(spans, node, offset);
+  if (node.isLeaf) return null;
+  return taker.takeRange(offset, offset + node.nodeSize);
+}
+// DecorationSet.addInner: merge new child sets into the sorted children array in one pass (no splice per child).
+// Returns undefined when no child received decorations.
+function addChildrenPatched(set, doc, decorations, offset) {
+  var old = set.children, out, j = 0;
+  var taker = makeTaker(decorations, doc.childCount);
+  doc.forEach(function (childNode, childOffset) {
+    var baseOffset = childOffset + offset, found = takeSpans(taker, decorations, childNode, baseOffset);
+    if (!found) return;
+    if (!out) out = [];
+    while (j < old.length && old[j] < childOffset) {
+      out.push(old[j], old[j + 1], old[j + 2]);
+      j += 3;
+    }
+    if (j < old.length && old[j] == childOffset) {
+      out.push(old[j], old[j + 1], old[j + 2].addInner(childNode, found, baseOffset + 1));
+      j += 3;
+    } else {
+      out.push(childOffset, childOffset + childNode.nodeSize, buildTree(found, childNode, baseOffset + 1, noSpec));
+    }
+  });
+  if (out) while (j < old.length) {
+    out.push(old[j], old[j + 1], old[j + 2]);
+    j += 3;
+  }
+  return out;
+}
+// DecorationSet.removeInner, children part. Returns set.children itself when untouched.
+function removeChildrenPatched(set, decorations, offset) {
+  var children = set.children, out = null;
+  var taker = makeTaker(decorations, children.length / 3);
+  for (var i = 0; i < children.length; i += 3) {
+    var found = null, from = children[i] + offset, to = children[i + 1] + offset;
+    if (taker) {
+      found = taker.takeRange(from, to);
+    } else {
+      for (var j = 0, span; j < decorations.length; j++) if (span = decorations[j]) {
+        if (span.from > from && span.to < to) {
+          decorations[j] = null;
+          (found || (found = [])).push(span);
+        }
+      }
+    }
+    if (!found) {
+      if (out) out.push(children[i], children[i + 1], children[i + 2]);
+      continue;
+    }
+    if (!out) out = children.slice(0, i);
+    var removed = children[i + 2].removeInner(found, from + 1);
+    if (removed != empty) out.push(children[i], children[i + 1], removed);
+  }
+  return out || children;
+}
+// DecorationSet.removeInner, local part. Returns set.local itself when nothing is removed.
+function removeLocalsPatched(set, decorations, offset) {
+  var local = set.local;
+  if (!local.length) return local;
+  var i, j, span;
+  if (local.length * decorations.length <= SWEEP_MIN) {
+    for (i = 0; i < decorations.length; i++) if (span = decorations[i]) {
+      for (j = 0; j < local.length; j++) if (local[j].eq(span, offset)) {
+        if (local == set.local) local = set.local.slice();
+        local.splice(j--, 1);
+      }
+    }
+    return local;
+  }
+  // local is sorted by `from`: only entries with from == span.from - offset can be eq()
+  var gone = null;
+  for (i = 0; i < decorations.length; i++) if (span = decorations[i]) {
+    var target = span.from - offset, lo = 0, hi = local.length;
+    while (lo < hi) {
+      var mid = (lo + hi) >> 1;
+      if (local[mid].from >= target) hi = mid; else lo = mid + 1;
+    }
+    for (j = lo; j < local.length && local[j].from == target; j++)
+      if (local[j].eq(span, offset)) (gone || (gone = new Uint8Array(local.length)))[j] = 1;
+  }
+  if (!gone) return local;
+  var kept = [];
+  for (j = 0; j < local.length; j++) if (!gone[j]) kept.push(local[j]);
+  return kept;
+}
+// DecorationSet.forChild: binary search in the sorted children array.
+function childAt(set, offset) {
+  var ch = set.children, n = ch.length / 3, i;
+  if (n < 8) {
+    for (i = 0; i < ch.length; i += 3) if (ch[i] >= offset) return ch[i] == offset ? ch[i + 2] : undefined;
+    return undefined;
+  }
+  var lo = 0, hi = n;
+  while (lo < hi) {
+    var mid = (lo + hi) >> 1;
+    if (ch[mid * 3] >= offset) hi = mid; else lo = mid + 1;
+  }
+  return lo < n && ch[lo * 3] == offset ? ch[lo * 3 + 2] : undefined;
+}
+// DecorationSet.forChild only looks at inline decorations in `local`; cache that subset per (immutable) set so that
+// a parent with thousands of node decorations is not rescanned for every child.
+function inlineLocals(set) {
+  var local = set.local;
+  if (local.length < 8) return local;
+  var c = set.__inlineLocals;
+  if (!c) {
+    c = [];
+    for (var i = 0; i < local.length; i++) if (local[i].type instanceof InlineType) c.push(local[i]);
+    if (c.length == local.length) c = local;
+    set.__inlineLocals = c;
+  }
+  return c;
+}

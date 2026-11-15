@@ -1,0 +1,1 @@
+{"name":"wasm-lab","private":true,"type":"module","dependencies":{"comrak":"^0.48.0-rc.0","ironmark":"^3.1.0","markdown-it":"^15.0.3","markdown-wasm":"^1.2.0","md4w":"^0.2.7","remark-frontmatter":"^5.0.0","remark-gfm":"^4.0.1","remark-parse":"^11.0.0","shiki":"^3.14.0","unified":"^11.0.5"}}
