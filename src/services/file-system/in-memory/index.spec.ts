@@ -109,10 +109,23 @@ describe("(in-memory) file-system service suite", async () => {
 
       const writable = await fileHandlerBefore.createWritable();
       await writable.write("after");
+      await writable.close();
 
       const fileHandlerAfter = await handler!.getFileHandle("file-1.md");
       const fileAfter = await fileHandlerAfter.getFile();
       const fileContentAfter = await fileAfter.text();
+
+      expect(fileContentBefore).toBe("before");
+      expect(fileContentAfter).toBe("after");
+
+      // The File obtained before the write is a snapshot and must not change.
+      expect(await fileBefore.text()).toBe("before");
     });
+
+    // Everything beyond "one write, then read it back" — positional writes,
+    // keepExistingData, commit-on-close, created entries becoming visible in
+    // the parent — lives in the backend-agnostic matrix in
+    // ../conformance/fsa-conformance.ts, which records which of them this
+    // implementation does not satisfy yet.
   });
 });
