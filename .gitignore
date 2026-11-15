@@ -161,3 +161,6 @@ playground/*
 !playground/pm-perf/
 # pm-perf benchmark output
 perf-results
+
+# Claude Code worktrees
+.claude/worktrees
