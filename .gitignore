@@ -158,3 +158,6 @@ dist
 
 # Stackanditto playground tests
 playground/*
+!playground/pm-perf/
+# pm-perf benchmark output
+perf-results

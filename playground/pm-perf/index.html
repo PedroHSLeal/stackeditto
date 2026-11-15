@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PG - pm-perf</title>
+  <style>
+    html, body { margin: 0; height: 100%; }
+    #scroller { position: fixed; inset: 0; overflow: auto; background: white; }
+    /* Same layout box the app gives the editor (see prosemirror/Container.vue). */
+    #scroller.padded > #mount { padding: 6px 12px; }
+    /* strategy: content-visibility */
+    .cv .ProseMirror > * { content-visibility: auto; contain-intrinsic-size: auto 60px; }
+    /* strategy: pm-window */
+    .pm-placeholder { margin: 0; padding: 0; contain: strict; }
+  </style>
+</head>
+
+<body>
+  <div id="scroller"><div id="mount"></div></div>
+  <script type="module" src="/pm-perf/main.ts"></script>
+</body>
+
+</html>
