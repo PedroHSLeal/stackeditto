@@ -5,12 +5,12 @@
       <ProsemirrorEditor :value="fileValue" style="flex-grow: 1" />
     </ProsemirrorContainer>
   </template>
-  <template v-else-if="!isMarkdown && (fileValue && fileExtension)">
+  <template v-else-if="fileValue && fileExtension">
     <MonacoEditor :value="fileValue" :extension="fileExtension" />
   </template>
 </template>
 <script setup lang="ts">
-import { computed, onBeforeUpdate, onMounted, onUpdated, shallowRef } from 'vue';
+import { computed, shallowRef, watch } from 'vue';
 
 import ProsemirrorEditor from './editors/prosemirror/Editor.vue';
 import ProsemirrorContainer from './editors/prosemirror/Container.vue';
@@ -34,6 +34,6 @@ async function updateFile() {
   }
 }
 
-onMounted(async () => await updateFile());
-onUpdated(async () => await updateFile());
+// lê o arquivo só quando a prop muda (antes, onUpdated relia do disco a cada re-render)
+watch(() => props.value, updateFile, { immediate: true });
 </script>

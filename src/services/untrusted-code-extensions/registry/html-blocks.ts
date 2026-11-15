@@ -6,15 +6,11 @@ type UntrustedHtmlBlockRegistry = {
 
 const registryUntrustedHtmlBlocks: { [htmlTag: string]: UntrustedHtmlBlockRegistry } = {};
 
-export function registerUntrustedHtmlBlock(extensionData: { htmlTag: string } & UntrustedHtmlBlockRegistry) {
-  if (extensionData.htmlTag) {
-    registryUntrustedHtmlBlocks[extensionData.htmlTag] = {
-      init: extensionData.init,
-      toMarkdown: extensionData.toMarkdown,
-      toHtml: extensionData.toHtml
-    };
+export function registerUntrustedHtmlBlock({ htmlTag, init, toMarkdown, toHtml }: { htmlTag: string } & UntrustedHtmlBlockRegistry) {
+  if (htmlTag) {
+    registryUntrustedHtmlBlocks[htmlTag] = { init, toMarkdown, toHtml };
 
-    console.log(`custom-element ${extensionData.htmlTag} registrado!`);
+    console.log(`custom-element ${htmlTag} registrado!`);
   }
 }
 

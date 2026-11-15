@@ -1,51 +1,43 @@
+export type HtmlBlockParams = { tag: string, content?: string, attrs?: string[][] };
+
 // <asdf-asdf_ASDF-123>(...)</asdf-asdf_ASDF-123>
-const htmlFullWithoutAttrs = (content: string) => {
-  let regex = /^(?<start_tag><(?:\w|\-|\_)+>)(?<content>(?:.|\n)*)(?<finish_tag><\/(?:\w|\-|\_)+>)/gms;
-  let result = regex.exec(content);
-
-  if (!result) return null;
-
-  return {
-    tag: result.groups!.start_tag.replace(/</, "")?.replace(/>/, ""),
-    content: result.groups!.content
-  }
-};
+const FULL_WITHOUT_ATTRS = /^<(?<tag>[\w-]+)>(?<content>.*)<\/[\w-]+>/ms;
 
 // <asdf-asdf_ASDF-123 asdf="">(...)</asdf-asdf_ASDF-123>
-const htmlFullWithAttrs = (content: string) => {
-  let regex = /^(?<start_tag><(?:\w|\-|\_)+ (?<attrs>(?:(?:\w|\-|\_)+=".*"\s?)*)>)(?<content>(?:.|\n)*)(?<finish_tag><\/(?:\w|\-|\_)+>)/gms;
-  let result = regex.exec(content)!;
+const FULL_WITH_ATTRS = /^<(?<tag>[\w-]+) (?<attrs>(?:[\w-]+=".*"\s?)*)>(?<content>.*)<\/[\w-]+>/ms;
 
-  if (!result) return null;
+//<asdf-asdf_ASDF-123 /> || <asdf-asdf_ASDF-123>
+const SELF_CLOSING = /^<(?<tag>[\w-]+\s*\/?)>/ms;
 
-  let attrs = result.groups!.attrs.split(" ").map(attr => {
+const htmlFullWithoutAttrs = (content: string): HtmlBlockParams | null => {
+  const groups = FULL_WITHOUT_ATTRS.exec(content)?.groups;
+
+  return groups ? { tag: groups.tag, content: groups.content } : null;
+};
+
+const htmlFullWithAttrs = (content: string): HtmlBlockParams | null => {
+  const groups = FULL_WITH_ATTRS.exec(content)?.groups;
+
+  if (!groups) return null;
+
+  let attrs = groups.attrs.split(" ").map(attr => {
     let kv = attr.split("=");
     return [kv[0], kv[1].replace("\"", "")];
   })
 
-  return {
-    tag: result.groups!.start_tag.replace(` ${result.groups!.attrs}`, "").replace(/</, "")?.replace(/>/, ""),
-    content: result.groups!.content,
-    attrs,
-  }
+  return { tag: groups.tag, content: groups.content, attrs };
 };
 
-//<asdf-asdf_ASDF-123 /> || <asdf-asdf_ASDF-123>
-const htmlSelfClosing = (content: string) => {
-  let regex = /^(?<tag><(?:\w|\-|\_)+\s*(?:\/)?>)/gms;
-  let result = regex.exec(content);
+const htmlSelfClosing = (content: string): HtmlBlockParams | null => {
+  const groups = SELF_CLOSING.exec(content)?.groups;
 
-  if (!result) return null;
-
-  return {
-    tag: result.groups!.tag.replace(/</, "")?.replace(/>/, ""),
-  }
+  return groups ? { tag: groups.tag } : null;
 };
 
-export function chooseRegex(content: string): ({ tag: string, content?: string, attrs?: string[][] } | null)[] {
-  return [
-    htmlFullWithoutAttrs(content),
-    htmlFullWithAttrs(content),
-    htmlSelfClosing(content),
-  ]
+/** Primeiro formato que casar, na ordem acima; `undefined` deixa o node com os params default. */
+export function parseHtmlBlock(content: string): HtmlBlockParams | undefined {
+  return htmlFullWithoutAttrs(content)
+    ?? htmlFullWithAttrs(content)
+    ?? htmlSelfClosing(content)
+    ?? undefined;
 }

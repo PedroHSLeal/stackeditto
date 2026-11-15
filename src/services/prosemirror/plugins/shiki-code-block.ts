@@ -7,8 +7,7 @@ export const plainText = "plaintext";
 const baseLanguages = ['javascript', 'typescript', 'python', 'csharp', 'powershell', 'asm'];
 
 export function extractLanguageForHighlight(desiredLanguage: string) {
-  const i = baseLanguages.indexOf(desiredLanguage);
-  return baseLanguages[i] ?? plainText;
+  return baseLanguages.includes(desiredLanguage) ? desiredLanguage : plainText;
 }
 
 const highlighter = await getSingletonHighlighter({

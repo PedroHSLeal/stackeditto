@@ -16,7 +16,7 @@ import { Icon } from "@iconify/vue";
 
 import type { Menu } from "@/models/top-menu";
 
-const props = defineProps<{ actions: Menu[] }>();
+defineProps<{ actions: Menu[] }>();
 </script>
 
 <style scoped lang="scss">

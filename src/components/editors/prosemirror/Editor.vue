@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { buildProsemirrorState, defaultNodeViews, buildProsemirrorView, updateProsemirrorView } from '@/services/prosemirror';
-import { onMounted, useTemplateRef, watch, watchEffect } from 'vue';
+import { onMounted, useTemplateRef, watch } from 'vue';
 import type { EditorView } from 'prosemirror-view';
 
 const props = defineProps<{ value: string }>();

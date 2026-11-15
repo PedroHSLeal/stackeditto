@@ -3,33 +3,37 @@ import type { Node } from "prosemirror-model"
 
 import { getUntrustedHtmlBlock } from "@/services/untrusted-code-extensions/registry/html-blocks";
 
+/** Namespace dos atributos que marcam, no DOM, o container de cada bloco HTML. */
+export const HTML_BLOCK_NAMESPACE = "stack-and-ditto";
+
+export const HTML_BLOCK_ATTRIBUTE = {
+  TAG: "tag",
+  POSITION: "position",
+} as const;
+
+/** `</tag/>`: o que o serializador escreve no lugar do bloco até `getProsemirrorText` trocar pelo markdown da extensão. */
+export const HTML_BLOCK_PLACEHOLDER = {
+  of: (tag: string) => `</${tag}/>`,
+  PATTERN: /<\/(.+?)\/>/g,
+};
+
 export class HtmlBlockView implements NodeView {
   dom: InstanceType<typeof window.Node>;
 
-  view: EditorView;
-  pos: number;
-
   constructor(node: Node, view: EditorView, getPos: () => number | undefined, decorations: readonly Decoration[], innerDecorations: DecorationSource) {
-    this.view = view;
-    this.pos = getPos()!;
+    const { tag, attrs, content } = node.attrs.params;
 
     const containerElement = document.createElement("div");
-    containerElement.setAttributeNS("stack-and-ditto", "tag", node.attrs.params.tag);
-    containerElement.setAttributeNS("stack-and-ditto", "position", this.pos.toString());
+    containerElement.setAttributeNS(HTML_BLOCK_NAMESPACE, HTML_BLOCK_ATTRIBUTE.TAG, tag);
+    containerElement.setAttributeNS(HTML_BLOCK_NAMESPACE, HTML_BLOCK_ATTRIBUTE.POSITION, getPos()!.toString());
 
-    const element: HTMLElement = document.createElement(node.attrs.params.tag);
+    const element: HTMLElement = document.createElement(tag);
 
-    if (node.attrs.params.attrs) {
-      for (const [key, value] of node.attrs.params.attrs) {
-        element.setAttribute(key, value);
-      }
+    for (const [key, value] of attrs ?? []) {
+      element.setAttribute(key, value);
     }
 
-    const customElementRegistry = getUntrustedHtmlBlock(node.attrs.params.tag);
-
-    if (customElementRegistry) {
-      customElementRegistry.init(element, node.attrs.params.content);
-    }
+    getUntrustedHtmlBlock(tag)?.init(element, content);
 
     containerElement.appendChild(element);
 

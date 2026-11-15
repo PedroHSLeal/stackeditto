@@ -10,27 +10,13 @@ import {
   type RemarkProseMirrorOptions,
 } from "@handlewithcare/remark-prosemirror";
 
-import { Schema, type Node } from "prosemirror-model";
+import type { Node, NodeType } from "prosemirror-model";
 
-import { mySchema } from "@/services/prosemirror";
-import { chooseRegex } from "@/services/prosemirror/tokens/html-tokens";
+import { mySchema } from "@/services/prosemirror/schema";
+import { parseHtmlBlock } from "@/services/prosemirror/tokens/html-tokens";
 import type { Value as UnifiedValue } from "~/unified/lib";
 
-export async function markdownToProseMirror(markdown: UnifiedValue): Promise<Node> {
-  const doc = await unified()
-    .use(remarkParse)
-    .use(remarkGfm)
-    .use(remarkFrontmatter)
-    .use(remarkProseMirror, {
-      schema: mySchema,
-      handlers: remarkProsemirrorHandlers(mySchema)
-    })
-    .process(markdown);
-
-  return doc.result;
-}
-
-const remarkProsemirrorHandlers = (mySchema: Schema) => ({
+const handlers = {
   // NODES:
   root: toPmNode(mySchema.nodes.doc),
   heading: toPmNode(mySchema.nodes.heading, (node) => ({ level: node.depth })),
@@ -47,66 +33,46 @@ const remarkProsemirrorHandlers = (mySchema: Schema) => ({
     return nodeType.createAndFill({ order: node.start ?? 1 }, children);
   },
   listItem: toPmNode(mySchema.nodes.list_item),
-  code: (node, parent, state) => {
-    const nodeType = mySchema.nodes.code_block;
-    const createdNode = nodeType.createAndFill({ language: node.lang }, mySchema.text(node.value));
-    return createdNode;
-  },
+  code: (node) => mySchema.nodes.code_block.createAndFill({ language: node.lang }, mySchema.text(node.value)),
   thematicBreak: toPmNode(mySchema.nodes.horizontal_rule),
   imageReference: (node, parent, state) => {
-    if (!state.definitionById.has(node.identifier.toUpperCase()))
-      return mySchema.nodes.paragraph.create();
-
     let imageRef = state.definitionById.get(node.identifier.toUpperCase());
 
-    return mySchema.nodes.image.create({ src: imageRef?.url, title: imageRef?.title });
+    if (!imageRef)
+      return mySchema.nodes.paragraph.create();
+
+    return mySchema.nodes.image.create({ src: imageRef.url, title: imageRef.title });
   },
   //TODO: tenho que ver o pq o footnote está inserido após o texto...
   footnoteReference: (node, parent, state) => {
-    if (!state.footnoteById.has(node.identifier.toUpperCase()))
-      return mySchema.nodes.paragraph.create();
-
     let footnoteRef = state.footnoteById.get(node.identifier.toUpperCase());
 
     if (footnoteRef?.children == undefined)
       return mySchema.nodes.paragraph.create();
 
-    return footnoteRef!.children.map(c => state.all(c)).flat();
+    return footnoteRef.children.map(c => state.all(c)).flat();
   },
 
   // TABLES:
+  // tabela de uma linha só vira só tbody; senão a primeira linha é o thead
   table: (node, parent, state) => {
-    let tHeadType = mySchema.nodes.thead;
-    let tBodyType = mySchema.nodes.tbody;
+    const { thead, tbody, tr, th, td } = mySchema.nodes;
+    const [head, ...rows] = node.children;
 
-    let trType = mySchema.nodes.tr;
-    let tdType = mySchema.nodes.td;
-    let thType = mySchema.nodes.th;
+    const tableRow = (row: TableRow, cellType: NodeType) =>
+      tr.create({}, row.children.map(cell => cellType.create({}, state.all(cell))));
 
-    let head = node.children[0];
-    let body = node.children.length == 1
-      ? node.children[0]
-      : node.children.slice(1);
-
-    const children = [];
-
-    if (head == body) {
-      children.push(tBodyType.create({}, trType.create({}, body.children.map(cell => tdType.create({}, state.all(cell))))));
-    }
-    else {
-      children.push(tHeadType.create({}, trType.create({}, head.children.map(cell => thType.create({}, state.all(cell))))));
-      children.push(tBodyType.create({}, (body as TableRow[]).map(tr => trType.create({}, tr.children.map(cell => tdType.create({}, state.all(cell)))))));
-    }
+    const children = rows.length == 0
+      ? [tbody.create({}, tableRow(head, td))]
+      : [
+        thead.create({}, tableRow(head, th)),
+        tbody.create({}, rows.map(row => tableRow(row, td))),
+      ];
 
     return mySchema.nodes.table.create({}, children);
   },
 
-  html: (node, parent, state) => {
-    const htmlType = mySchema.nodes.html_block;
-    const result = chooseRegex(node.value).find(r => !!r);
-
-    return htmlType.createAndFill({ params: result });
-  },
+  html: (node) => mySchema.nodes.html_block.createAndFill({ params: parseHtmlBlock(node.value) }),
 
   // MARKS:
   emphasis: toPmMark(mySchema.marks.em),
@@ -119,5 +85,20 @@ const remarkProsemirrorHandlers = (mySchema: Schema) => ({
   }),
   inlineCode: toPmMark(mySchema.marks.code),
   delete: toPmMark(mySchema.marks.s),
-}) satisfies RemarkProseMirrorOptions['handlers'];
+} satisfies RemarkProseMirrorOptions['handlers'];
 
+const processor = unified()
+  .use(remarkParse)
+  .use(remarkGfm)
+  .use(remarkFrontmatter)
+  .use(remarkProseMirror, {
+    schema: mySchema,
+    handlers
+  })
+  .freeze();
+
+export async function markdownToProseMirror(markdown: UnifiedValue): Promise<Node> {
+  const doc = await processor.process(markdown);
+
+  return doc.result;
+}

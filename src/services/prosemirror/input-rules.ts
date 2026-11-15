@@ -5,22 +5,31 @@ import {
 } from "prosemirror-inputrules";
 import { MarkType, NodeType, Schema } from "prosemirror-model";
 
+const ruleOptions = { undoable: true, inCode: false, inCodeMark: false };
+
+// [texto](url "título") — compartilhado pelos atalhos de link e de imagem (`!` na frente)
+const linkSyntax = /\[(?<alt>(?:\w|\s)*)\]\((?<url>(?:\S)+)(?:\s\"(?<title>.+)\")?\)\s$/.source;
+
 export function buildInputRules(schema: Schema) {
-  let rules = smartQuotes.concat(ellipsis, emDash), type
-  if (type = schema.nodes.blockquote) rules.push(blockQuoteRule(type))
-  if (type = schema.nodes.ordered_list) rules.push(orderedListRule(type))
-  if (type = schema.nodes.bullet_list) rules.push(bulletListRule(type))
-  if (type = schema.nodes.code_block) rules.push(codeBlockRule(type))
-  if (type = schema.nodes.heading) rules.push(headingRule(type))
-  if (type = schema.nodes.horizontal_rule) rules.push(hrRule(type))
-  if (type = schema.nodes.image) rules.push(imgRule(type))
+  const { nodes, marks } = schema;
 
-  if (type = schema.marks.strong) rules.push(strongRule(type));
-  if (type = schema.marks.em) rules.push(italicRule(type));
-  if (type = schema.marks.s) rules.push(strikethroughRule(type));
-  if (type = schema.marks.link) rules.push(linkRule(type));
+  return inputRules({
+    rules: [
+      ...smartQuotes, ellipsis, emDash,
+      blockQuoteRule(nodes.blockquote),
+      orderedListRule(nodes.ordered_list),
+      bulletListRule(nodes.bullet_list),
+      codeBlockRule(nodes.code_block),
+      headingRule(nodes.heading),
+      hrRule(nodes.horizontal_rule),
+      imgRule(nodes.image),
 
-  return inputRules({ rules })
+      delimitedMarkRule("**", marks.strong),
+      delimitedMarkRule("__", marks.em),
+      delimitedMarkRule("~~", marks.s),
+      linkRule(marks.link),
+    ]
+  });
 }
 
 export function blockQuoteRule(nodeType: NodeType) {
@@ -71,75 +80,39 @@ export function hrRule(nodeType: NodeType) {
       .insert(start - 1, nodeType.create());
 
     return tr;
-  }, { undoable: true, inCode: false, inCodeMark: false });
+  }, ruleOptions);
 }
 
-export function strongRule(markType: MarkType) {
-  return new InputRule(/\*{2}\s$/, (state, match, start, end) => {
+/** `**negrito** `, `__itálico__ `, `~~riscado~~ `: delimitador de 2 caracteres seguido de espaço. */
+export function delimitedMarkRule(delimiter: string, markType: MarkType) {
+  const escaped = delimiter.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  return new InputRule(new RegExp(`${escaped}\\s$`), (state, match) => {
     let stringToSearch = match.input ?? "";
-    let firstPairOfDoubleStars = stringToSearch.indexOf("**");
-    let secondPairOfDoubleStars = stringToSearch.indexOf("**", firstPairOfDoubleStars + 2);
+    let firstDelimiter = stringToSearch.indexOf(delimiter);
+    let secondDelimiter = stringToSearch.indexOf(delimiter, firstDelimiter + 2);
 
-    if (firstPairOfDoubleStars > -1 && secondPairOfDoubleStars > -1) {
-      let tr = state.tr
-        .delete(secondPairOfDoubleStars + 1, secondPairOfDoubleStars + 3)
-        .delete(firstPairOfDoubleStars, firstPairOfDoubleStars + 3)
-        .addMark(firstPairOfDoubleStars, secondPairOfDoubleStars, markType.create())
+    if (firstDelimiter == -1 || secondDelimiter == -1) return null;
 
-      return tr;
-    }
-    else return null;
-  }, { undoable: true, inCode: false, inCodeMark: false });
-}
-
-export function italicRule(markType: MarkType) {
-  return new InputRule(/\_{2}\s$/, (state, match, start, end) => {
-    let stringToSearch = match.input ?? "";
-    let firstPairOfDoubleStars = stringToSearch.indexOf("__");
-    let secondPairOfDoubleStars = stringToSearch.indexOf("__", firstPairOfDoubleStars + 2);
-
-    if (firstPairOfDoubleStars > -1 && secondPairOfDoubleStars > -1) {
-      let tr = state.tr
-        .delete(secondPairOfDoubleStars + 1, secondPairOfDoubleStars + 3)
-        .delete(firstPairOfDoubleStars, firstPairOfDoubleStars + 3)
-        .addMark(firstPairOfDoubleStars, secondPairOfDoubleStars, markType.create())
-
-      return tr;
-    }
-    else return null;
-  }, { undoable: true, inCode: false, inCodeMark: false });
-}
-
-export function strikethroughRule(markType: MarkType) {
-  return new InputRule(/\~{2}\s$/, (state, match, start, end) => {
-    let stringToSearch = match.input ?? "";
-    let firstPairOfDoubleStars = stringToSearch.indexOf("~~");
-    let secondPairOfDoubleStars = stringToSearch.indexOf("~~", firstPairOfDoubleStars + 2);
-
-    if (firstPairOfDoubleStars > -1 && secondPairOfDoubleStars > -1) {
-      let tr = state.tr
-        .delete(secondPairOfDoubleStars + 1, secondPairOfDoubleStars + 3)
-        .delete(firstPairOfDoubleStars, firstPairOfDoubleStars + 3)
-        .addMark(firstPairOfDoubleStars, secondPairOfDoubleStars, markType.create())
-
-      return tr;
-    }
-    else return null;
-  }, { undoable: true, inCode: false, inCodeMark: false });
+    return state.tr
+      .delete(secondDelimiter + 1, secondDelimiter + 3)
+      .delete(firstDelimiter, firstDelimiter + 3)
+      .addMark(firstDelimiter, secondDelimiter, markType.create());
+  }, ruleOptions);
 }
 
 export function imgRule(nodeType: NodeType) {
-  return new InputRule(/^!\[(?<alt>(?:\w|\s)*)\]\((?<url>(?:\S)+)(?:\s\"(?<title>.+)\")?\)\s$/, (state, match, start, end) => {
+  return new InputRule(new RegExp(`^!${linkSyntax}`), (state, match, start, end) => {
     let tr = state.tr
       .delete(start, end)
       .insert(start - 1, nodeType.create({ src: match.groups?.url, alt: match.groups?.alt, title: match.groups?.title }));
 
     return tr;
-  }, { undoable: true, inCode: false, inCodeMark: false });
+  }, ruleOptions);
 }
 
 export function linkRule(markType: MarkType) {
-  return new InputRule(/^\[(?<alt>(?:\w|\s)*)\]\((?<url>(?:\S)+)(?:\s\"(?<title>.+)\")?\)\s$/, (state, match, start, end) => {
+  return new InputRule(new RegExp(`^${linkSyntax}`), (state, match, start, end) => {
     let tr = state.tr;
     let title = (match.groups?.alt ?? match.groups?.title) ?? "nao funcionou :(";
 
@@ -148,6 +121,5 @@ export function linkRule(markType: MarkType) {
       .addMark(start, start + title.length, markType.create({ href: match.groups?.url }));
 
     return tr;
-  }, { undoable: true, inCode: false, inCodeMark: false });
+  }, ruleOptions);
 }
-

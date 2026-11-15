@@ -159,11 +159,10 @@ async function populateDirectory(openDirectoryPicker = true) {
 async function executeUntrustedScripts() {
   let userUntrustedFiles = fsImpl.getAllFilesFromDirectory(store.$state.configDirectory!);
 
-  let userUntrustedModules = userUntrustedFiles.filter(file => file.name.endsWith(".mjs"))
+  let userUntrustedModules = userUntrustedFiles.filter(file => file.extensionFile == "mjs")
     .map(({ text, webkitRelativePath }) => ({ text: text, webkitRelativePath }));
 
-  let userUntrustedScripts = userUntrustedFiles.filter(file => file.name.endsWith(".js"))
-    .filter(f => f.size > 0)
+  let userUntrustedScripts = userUntrustedFiles.filter(file => file.extensionFile == "js" && file.size > 0)
     .map(file => file.text());
 
   await executeUntrustedScript(userUntrustedScripts);
