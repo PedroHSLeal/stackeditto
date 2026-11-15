@@ -10,7 +10,9 @@
 
     "paths": {
       "@/*": ["./src/*"],
-      "~/*": ["./node_modules/*"]
+      "~/*": ["./node_modules/*"],
+      "<md>/*": ["./md/*"],
+      "<p>/*": ["./playground/*"]
     }
   }
 }
