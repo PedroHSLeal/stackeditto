@@ -1,6 +1,6 @@
 # Stackeditto
 
-## [BR] Contexto
+### contexto
 
 No ano 2023 eu conheci o programa "Obsidian" e me apaixonei principalmente por esses 2 pontos:
 - poder escrever documentos em formato markdown, oq dá uma liberdade do escritor de formatar com tipos de enfase(sublinhado,negrito, cabeçalhos, etc)
@@ -19,54 +19,54 @@ Na versão v0.1, este projeto consiste em testar um pouco as capacidades de
 
 ### ideias a serem implementadas na versao v0.1
 
-[x] fazer funcionar a troca de arquivos
-[x] configuracao basica do monaco editor no browser
-[x] ver a renderizacao do markdown em html com o arquivo selecionado no editor
-[x] salvar o arquivo com o texto alterado no browser pro arquivo local
-[x] atualizacao reativa do texto no markdown renderizado
-[x] carregar uma fonte bonita (JetBrains Mono) tanto no editor quanto na interface
-[x] sistema de plugins (seguindo na ordem, katex, mermaid)
-[x] sistema de plugins de scripts js simples (pensar um pouco melhor nessa ideia)
-[x] pensar em uma interface simples
+- [x] fazer funcionar a troca de arquivos
+- [x] configuracao basica do monaco editor no browser
+- [x] ver a renderizacao do markdown em html com o arquivo selecionado no editor
+- [x] salvar o arquivo com o texto alterado no browser pro arquivo local
+- [x] atualizacao reativa do texto no markdown renderizado
+- [x] carregar uma fonte bonita (JetBrains Mono) tanto no editor quanto na interface
+- [x] sistema de plugins (seguindo na ordem, katex, mermaid)
+- [x] sistema de plugins de scripts js simples (pensar um pouco melhor nessa ideia)
+- [x] pensar em uma interface simples
 
 ### ideias a serem implementadas na versao v0.2
 
-[x] adicao de novos arquivos
-[x] melhoria das interfaces
-[ ] testes de componentes
-[x] refatoracao da estrutura de extensões
-[ ] add lib de tour do projeto (driver.js)
-[x] teste com prosemirror
- - [x] teste para poder pegar o conteudo do editor transformado em markdown, para salvar no arquivo
- - - vou ter que instalar outra lib... kkkrying... :(
- - - - posso usar o turndown :) É bem facil extender as funcionalidades nessa lib
- - [x] fazer o teste de funcionalidade com cada tipo de escrita
- - - testando a versao mobile e desktop
- - - - copiando oq temos no whatsapp
- - - - [X] headings
- - - - [x] horizontal rules
- - - - [x] idk
- - - - [x] emphasis
- - - - - será que, dá pra fazer a decoracao de colocar os caracteres em volta do texto de enfase?
- - - - - por enquanto, aceito somente enfase que tem um par(um caracter em seguida do outro) de caracteres que condiz
- - - - [x] blockquotes
- - - - [x] lists
- - - - - tem que ver de como ajusta a ordem dos itens
- - - - - adicionar comando que adiciona mais um item na lista
- - - - [x] code
- - - - [x] tables
- - - - [x] links
- - - - [x] images
- - - - [x] plugins
- - - - [x] metadata
- - fazer o menu de topo com as acoes mais comuns do markdown
-[ ] protocolo de failsafe
- - protocolo de segurança para somente os arquivos que vao ser utilizados pelo app
- - - salvar no opfs
- - - em formato zip
+- [x] adicao de novos arquivos
+- [x] melhoria das interfaces
+- [ ] testes de componentes
+- [x] refatoracao da estrutura de extensões
+- [ ] add lib de tour do projeto (driver.js)
+- [x] teste com prosemirror
+- [x] teste para poder pegar o conteudo do editor transformado em markdown, para salvar no arquivo
+- - vou ter que instalar outra lib... kkkrying... :(
+- - - posso usar o turndown :) É bem facil extender as funcionalidades nessa lib
+- [x] fazer o teste de funcionalidade com cada tipo de escrita
+- - testando a versao mobile e desktop
+- - - copiando oq temos no whatsapp
+- - - [X] headings
+- - - [x] horizontal rules
+- - - [x] idk
+- - - [x] emphasis
+- - - - será que, dá pra fazer a decoracao de colocar os caracteres em volta do texto de enfase?
+- - - - por enquanto, aceito somente enfase que tem um par(um caracter em seguida do outro) de caracteres que condiz
+- - - [x] blockquotes
+- - - [x] lists
+- - - - tem que ver de como ajusta a ordem dos itens
+- - - - adicionar comando que adiciona mais um item na lista
+- - - [x] code
+- - - [x] tables
+- - - [x] links
+- - - [x] images
+- - - [x] plugins
+- - - [x] metadata
+- fazer o menu de topo com as acoes mais comuns do markdown
+- [ ] protocolo de failsafe
+- protocolo de segurança para somente os arquivos que vao ser utilizados pelo app
+- - salvar no opfs
+- - em formato zip
 
 ### backlog de estudos
- - web workers para as extensoes mais simples
- - indexedDB para indexar os arquivos e fazer processamento dos arquivos
- - ver a performance de leitura de arquivos, a principio para extensoes para posteriormente ser usado por find/replace
- - libs importantes pra adicionar pro projeto: browser-fs-access, dixie.js
+- web workers para as extensoes mais simples
+- indexedDB para indexar os arquivos e fazer processamento dos arquivos
+- ver a performance de leitura de arquivos, a principio para extensoes para posteriormente ser usado por find/replace
+- libs interessantes pra adicionar pro projeto: browser-fs-access, dixie.js, pagefind
