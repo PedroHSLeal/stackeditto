@@ -1,6 +1,8 @@
 import { useFileSystem as fsaUseFileSystem } from "./fsa";
 import { useFileSystem as inMemoryFileSystem } from "./in-memory";
 
+export * from "./utils";
+
 type Implementations = {
   physical: ReturnType<typeof fsaUseFileSystem>;
   inMemory: ReturnType<typeof inMemoryFileSystem>;
