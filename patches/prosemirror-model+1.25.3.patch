@@ -1,0 +1,137 @@
+diff --git a/node_modules/prosemirror-model/dist/index.cjs b/node_modules/prosemirror-model/dist/index.cjs
+index b34cd59..aa81726 100644
+--- a/node_modules/prosemirror-model/dist/index.cjs
++++ b/node_modules/prosemirror-model/dist/index.cjs
+@@ -87,6 +87,7 @@ var Fragment = function () {
+     _classCallCheck(this, Fragment);
+     this.content = content;
+     this.size = size || 0;
++    this.ends = null;
+     if (size == null) for (var i = 0; i < content.length; i++) this.size += content[i].nodeSize;
+   }
+   _createClass(Fragment, [{
+@@ -173,9 +174,17 @@ var Fragment = function () {
+       var current = this.content[index];
+       if (current == node) return this;
+       var copy = this.content.slice();
+-      var size = this.size + node.nodeSize - current.nodeSize;
++      var delta = node.nodeSize - current.nodeSize;
+       copy[index] = node;
+-      return new Fragment(copy, size);
++      var result = new Fragment(copy, this.size + delta);
++      if (this.ends) {
++        // Hand the offset table over to the new fragment (the old one rebuilds it on demand).
++        var ends = this.ends;
++        if (delta) for (var i = index; i < ends.length; i++) ends[i] += delta;
++        result.ends = ends;
++        this.ends = null;
++      }
++      return result;
+     }
+   }, {
+     key: "addToStart",
+@@ -249,6 +258,17 @@ var Fragment = function () {
+       if (pos == 0) return retIndex(0, pos);
+       if (pos == this.size) return retIndex(this.content.length, pos);
+       if (pos > this.size || pos < 0) throw new RangeError("Position ".concat(pos, " outside of fragment (").concat(this, ")"));
++      if (this.content.length >= BIG_FRAGMENT && this.size < 2147483647 && pos >= 0) {
++        var ends = this.ends || (this.ends = cumulativeEnds(this.content));
++        var lo = 0,
++          hi = ends.length - 1; // first child whose end is >= pos
++        while (lo < hi) {
++          var mid = lo + hi >> 1;
++          if (ends[mid] >= pos) hi = mid;else lo = mid + 1;
++        }
++        if (ends[lo] == pos) return retIndex(lo + 1, pos);
++        return retIndex(lo, lo ? ends[lo - 1] : 0);
++      }
+       for (var i = 0, curPos = 0;; i++) {
+         var cur = this.child(i),
+           end = curPos + cur.nodeSize;
+@@ -314,6 +334,15 @@ var Fragment = function () {
+   return Fragment;
+ }();
+ Fragment.empty = new Fragment([], 0);
++
++// Cache of cumulative child end offsets for big fragments, so findIndex is O(log n) instead of O(n).
++var BIG_FRAGMENT = 128;
++function cumulativeEnds(content) {
++    var ends = new Int32Array(content.length);
++    for (var i = 0, pos = 0; i < content.length; i++)
++        ends[i] = pos += content[i].nodeSize;
++    return ends;
++}
+ var found = {
+   index: 0,
+   offset: 0
+diff --git a/node_modules/prosemirror-model/dist/index.js b/node_modules/prosemirror-model/dist/index.js
+index c933a50..e64c452 100644
+--- a/node_modules/prosemirror-model/dist/index.js
++++ b/node_modules/prosemirror-model/dist/index.js
+@@ -73,6 +73,7 @@ class Fragment {
+     content, size) {
+         this.content = content;
+         this.size = size || 0;
++        this.ends = null;
+         if (size == null)
+             for (let i = 0; i < content.length; i++)
+                 this.size += content[i].nodeSize;
+@@ -183,9 +184,19 @@ class Fragment {
+         if (current == node)
+             return this;
+         let copy = this.content.slice();
+-        let size = this.size + node.nodeSize - current.nodeSize;
++        let delta = node.nodeSize - current.nodeSize;
+         copy[index] = node;
+-        return new Fragment(copy, size);
++        let result = new Fragment(copy, this.size + delta);
++        if (this.ends) {
++            // Hand the offset table over to the new fragment (the old one rebuilds it on demand).
++            let ends = this.ends;
++            if (delta)
++                for (let i = index; i < ends.length; i++)
++                    ends[i] += delta;
++            result.ends = ends;
++            this.ends = null;
++        }
++        return result;
+     }
+     /**
+     Create a new fragment by prepending the given node to this
+@@ -279,6 +290,20 @@ class Fragment {
+             return retIndex(this.content.length, pos);
+         if (pos > this.size || pos < 0)
+             throw new RangeError(`Position ${pos} outside of fragment (${this})`);
++        if (this.content.length >= BIG_FRAGMENT && this.size < 2147483647 && pos >= 0) {
++            let ends = this.ends || (this.ends = cumulativeEnds(this.content));
++            let lo = 0, hi = ends.length - 1; // first child whose end is >= pos
++            while (lo < hi) {
++                let mid = (lo + hi) >> 1;
++                if (ends[mid] >= pos)
++                    hi = mid;
++                else
++                    lo = mid + 1;
++            }
++            if (ends[lo] == pos)
++                return retIndex(lo + 1, pos);
++            return retIndex(lo, lo ? ends[lo - 1] : 0);
++        }
+         for (let i = 0, curPos = 0;; i++) {
+             let cur = this.child(i), end = curPos + cur.nodeSize;
+             if (end >= pos) {
+@@ -361,6 +386,15 @@ contain anything (rather than allocating a new empty fragment for
+ each leaf node).
+ */
+ Fragment.empty = new Fragment([], 0);
++
++// Cache of cumulative child end offsets for big fragments, so findIndex is O(log n) instead of O(n).
++const BIG_FRAGMENT = 128;
++function cumulativeEnds(content) {
++    let ends = new Int32Array(content.length);
++    for (let i = 0, pos = 0; i < content.length; i++)
++        ends[i] = pos += content[i].nodeSize;
++    return ends;
++}
+ const found = { index: 0, offset: 0 };
+ function retIndex(index, offset) {
+     found.index = index;
