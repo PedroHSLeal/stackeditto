@@ -26,7 +26,12 @@ export default defineConfig((env: ConfigEnv) => {
     },
     plugins: [
       ...basePlugins
-    ]
+    ],
+    build: {
+      // o highlighter do Shiki é criado com top-level await (prosemirror/plugins/shiki-code-block.ts),
+      // que o target padrão do Vite (es2020/chrome87) não aceita; o app já exige Chromium recente pela File System Access API
+      target: "es2022",
+    },
   };
 
   if (env.mode == "playground") {
