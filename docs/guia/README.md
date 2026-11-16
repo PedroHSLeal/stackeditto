@@ -55,7 +55,7 @@ O editor converte a sintaxe de markdown em formatação enquanto você digita. D
 | `1. ` | Lista numerada |
 | `- `, `* ` ou `+ ` | Lista com marcadores |
 | `> ` | Citação |
-| ```` ``` ```` | Bloco de código |
+| ```` ``` ```` + espaço, ou ```` ```js ```` + espaço | Bloco de código, com realce da linguagem |
 | `-- ` (dois hífens e espaço) | Linha horizontal |
 | `[texto](url) ` | Link |
 | `![alt](url) ` | Imagem |

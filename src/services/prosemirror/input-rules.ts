@@ -47,8 +47,9 @@ export function bulletListRule(nodeType: NodeType) {
   return wrappingInputRule(/^\s*([-+*])\s$/, nodeType)
 }
 
+// ``` + espaço, ou ```js + espaço para já sair com a linguagem do realce
 export function codeBlockRule(nodeType: NodeType) {
-  return textblockTypeInputRule(/^```$/, nodeType)
+  return textblockTypeInputRule(/^```([\w#+-]*)\s$/, nodeType, match => ({ language: match[1] || undefined }))
 }
 
 export function headingRule(nodeType: NodeType) {
