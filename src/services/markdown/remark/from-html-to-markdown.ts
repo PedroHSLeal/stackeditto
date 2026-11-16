@@ -9,6 +9,7 @@ import {
 import { type Node } from "prosemirror-model";
 
 import { mySchema } from "@/services/prosemirror/schema";
+import { plainText } from "@/services/prosemirror/plugins/shiki-code-block";
 import { HTML_BLOCK_PLACEHOLDER } from "@/services/prosemirror/node-views/html-block";
 
 const options = {
@@ -19,7 +20,11 @@ const options = {
     paragraph: fromPmNode("paragraph"),
     horizontal_rule: fromPmNode("thematicBreak"),
     blockquote: fromPmNode("blockquote"),
-    code_block: fromPmNode("code", (node) => { return { lang: node.attrs.language, value: node.textContent } }),
+    // "plaintext" é só o default do schema para bloco sem linguagem: volta a ser ``` puro no arquivo
+    code_block: fromPmNode("code", (node) => ({
+      lang: node.attrs.language && node.attrs.language !== plainText ? node.attrs.language : null,
+      value: node.textContent
+    })),
 
     list_item: fromPmNode("listItem"),
     ordered_list: fromPmNode("list", (node) => ({
