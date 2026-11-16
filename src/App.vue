@@ -46,6 +46,7 @@
     <ExtensionModal v-if="showExtension && !isMobile" :extensionFolder="store.$state.configDirectory!" @onNewResource="(op) => showNewResourceModal(op, store.$state.configDirectory!, false)" @onConfirm="reloadDirectoryStructure" @onClose="() => showExtension = false" />
     <NewFileOrDirectoryModal v-if="showNewResource" :workspace="newResourceWorkspace!" :operation="newResourceOperation!" @onConfirm="saveNewFileOrDirectory" @onCancel="showNewResource = false" />
     <RenameResourceModal v-if="showRenameResource" :resourceName="renameResourceName" :operation="renameResourceOperation!" @onConfirm="renameResource" @onCancel="() => showRenameResource = false" />
+    <FirstStepsModal v-if="showFirstSteps" @onClose="() => showFirstSteps = false" />
     <DeleteResourceModal v-if="showDeleteResource" :operation="deleteResourceOperation!" @onConfirm="deleteResource" @onCancel="() => showDeleteResource = false" />
 
     <Transition>
@@ -67,6 +68,7 @@ import NewFileOrDirectoryModal from './components/modals/NewFileOrDirectoryModal
 import RenameResourceModal from './components/modals/RenameResourceModal.vue';
 import DeleteResourceModal from './components/modals/DeleteResourceModal.vue';
 import LoadingModal from './components/modals/LoadingModal.vue';
+import FirstStepsModal from './components/modals/FirstStepsModal.vue';
 import DropdownMenu from './components/DropdownMenu.vue';
 import Editor from './components/Editor.vue';
 import Welcome from './components/Welcome.vue';
@@ -116,6 +118,7 @@ const showWorkspace = ref<boolean>(false);
 const showExtension = ref<boolean>(false);
 const showEditor = ref<boolean>(false);
 const showLoading = ref<boolean>(false);
+const showFirstSteps = ref<boolean>(false);
 
 const showRenameResource = ref<boolean>(false);
 const renameResourceName = ref("");
@@ -248,6 +251,11 @@ async function reopenFile(openedFileRelativePath: string) {
 }
 
 async function triggerWelcomeAction(type: WelcomeAction) {
+  if (type == 'firstSteps') {
+    showFirstSteps.value = true;
+    return;
+  }
+
   switch (type) {
     case 'tour':
     fs = useFileSystem("inMemory");

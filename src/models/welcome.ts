@@ -1,1 +1,1 @@
-export type WelcomeAction = "tour" | "openWorkspace";
+export type WelcomeAction = "tour" | "openWorkspace" | "firstSteps";

@@ -10,6 +10,7 @@
         <div style="display: flex; flex-direction: row; gap: 8px; justify-content: center;">
           <button class="primary" @click="() => emits('action', 'openWorkspace')">Workspace</button>
           <button class="primary" @click="() => emits('action', 'tour')">Tour</button>
+          <button class="primary" @click="() => emits('action', 'firstSteps')">Primeiros Passos</button>
         </div>
       </div>
     </div>
