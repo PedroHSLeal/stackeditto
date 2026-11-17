@@ -17,6 +17,7 @@ Budgets: open (read to first paint) ≤ 1000 · typing p95 ≤ 50 · scroll sett
 | full/all/prose@2 | ok | 2.0 | **3,305** | 2,605 | 1 | 694 | 369 | 572 | 2,712 | 90 | **145** | 64 | 0.00 | 40/40 | 404 | 36 | 125,790 |
 | full[view-1.42.3]/all/prose@2 | ok | 2.0 | **3,893** | 3,279 | 2 | 607 | 315 | 688 | 3,098 | 110 | **155** | 45 | 0.00 | 40/40 | 404 | 36 | 125,790 |
 | react/all/prose@2 | ok | 2.0 | **13,520** | 2,928 | 66 | 10,520 | 300 | 701 | 15,538 | 178 | **253** | 32 | 0.00 | 40/40 | **1,411** | 670 | 125,794 |
+| react-controlled/all/prose@2 | ok | 2.0 | **13,086** | 2,735 | 65 | 10,282 | 247 | 709 | 14,688 | 203 | **316** | 38 | 0.00 | 40/40 | **1,419** | 670 | 125,794 |
 
 ## Notes
 
@@ -31,3 +32,4 @@ Budgets: open (read to first paint) ≤ 1000 · typing p95 ≤ 50 · scroll sett
 - `full/all/prose@2`: saving unedited changes the file: 2,120,448 → 1,958,207 bytes
 - `full[view-1.42.3]/all/prose@2`: saving unedited changes the file: 2,120,448 → 1,958,207 bytes
 - `react/all/prose@2`: saving unedited changes the file: 2,120,448 → 1,958,207 bytes
+- `react-controlled/all/prose@2`: saving unedited changes the file: 2,120,448 → 1,958,207 bytes
