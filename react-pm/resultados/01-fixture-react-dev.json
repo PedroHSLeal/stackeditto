@@ -1,0 +1,1265 @@
+{
+ "meta": {
+  "date": "2026-11-17T22:48:32.707Z",
+  "suite": "react",
+  "browser": "Chromium 157.0.8103.78 headless",
+  "cpus": 4,
+  "noHighlight": false
+ },
+ "summaries": [
+  {
+   "id": "full/all/fixture@fixture",
+   "status": "ok",
+   "runs": 1,
+   "corpusBytes": 598222,
+   "openMs": 885,
+   "stages": {
+    "corpus": {
+     "ms": 0,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 5,
+     "domNodes": 25,
+     "rssMB": 108,
+     "bytes": 598222
+    },
+    "boot": {
+     "ms": 157,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 53,
+     "heapMB": 9,
+     "domNodes": 29,
+     "rssMB": 132
+    },
+    "read": {
+     "ms": 3,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 9,
+     "domNodes": 29,
+     "rssMB": 134
+    },
+    "parse": {
+     "ms": 717,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 11,
+     "domNodes": 29,
+     "rssMB": 140,
+     "topLevelBlocks": 2704
+    },
+    "state": {
+     "ms": 12,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 12,
+     "domNodes": 29,
+     "rssMB": 140
+    },
+    "mount": {
+     "ms": 153,
+     "layoutMs": 55,
+     "styleMs": 12,
+     "scriptMs": 0,
+     "heapMB": 15,
+     "domNodes": 21175,
+     "rssMB": 177
+    },
+    "save": {
+     "ms": 85,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 16,
+     "domNodes": 21175,
+     "rssMB": 180,
+     "bytes": 471297
+    },
+    "reopen": {
+     "ms": 580,
+     "layoutMs": 3,
+     "styleMs": 1,
+     "scriptMs": 0,
+     "heapMB": 17,
+     "domNodes": 21240,
+     "rssMB": 183
+    }
+   },
+   "typeP50": 30,
+   "typeP95": 42,
+   "typeLanded": true,
+   "scrollP95": 30.300000000046566,
+   "blank": 0,
+   "typingPerKeyMs": {
+    "script": 6,
+    "layout": 5,
+    "style": 0,
+    "task": 36
+   },
+   "arrowWalk": {
+    "presses": 40,
+    "moved": 40
+   },
+   "roundTrip": {
+    "savedBytes": 471297,
+    "originalBytes": 598222,
+    "identical": false
+   },
+   "copyAllChars": 440260,
+   "rssMB": 236,
+   "pageErrors": [],
+   "overBudget": []
+  },
+  {
+   "id": "full[view-1.42.3]/all/fixture@fixture",
+   "status": "ok",
+   "runs": 1,
+   "corpusBytes": 598222,
+   "openMs": 977,
+   "stages": {
+    "corpus": {
+     "ms": 0,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 5,
+     "domNodes": 25,
+     "rssMB": 109,
+     "bytes": 598222
+    },
+    "boot": {
+     "ms": 158,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 50,
+     "heapMB": 9,
+     "domNodes": 29,
+     "rssMB": 133
+    },
+    "read": {
+     "ms": 3,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 9,
+     "domNodes": 29,
+     "rssMB": 134
+    },
+    "parse": {
+     "ms": 745,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 11,
+     "domNodes": 29,
+     "rssMB": 139,
+     "topLevelBlocks": 2704
+    },
+    "state": {
+     "ms": 48,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 12,
+     "domNodes": 29,
+     "rssMB": 140
+    },
+    "mount": {
+     "ms": 181,
+     "layoutMs": 59,
+     "styleMs": 12,
+     "scriptMs": 0,
+     "heapMB": 15,
+     "domNodes": 21175,
+     "rssMB": 177
+    },
+    "save": {
+     "ms": 103,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 16,
+     "domNodes": 21180,
+     "rssMB": 180,
+     "bytes": 471297
+    },
+    "reopen": {
+     "ms": 938,
+     "layoutMs": 3,
+     "styleMs": 1,
+     "scriptMs": 0,
+     "heapMB": 17,
+     "domNodes": 21240,
+     "rssMB": 183
+    }
+   },
+   "typeP50": 29,
+   "typeP95": 35,
+   "typeLanded": true,
+   "scrollP95": 31.300000000046566,
+   "blank": 0,
+   "typingPerKeyMs": {
+    "script": 8,
+    "layout": 3,
+    "style": 0,
+    "task": 32
+   },
+   "arrowWalk": {
+    "presses": 40,
+    "moved": 40
+   },
+   "roundTrip": {
+    "savedBytes": 471297,
+    "originalBytes": 598222,
+    "identical": false
+   },
+   "copyAllChars": 440260,
+   "rssMB": 235,
+   "pageErrors": [],
+   "overBudget": []
+  },
+  {
+   "id": "react/all/fixture@fixture",
+   "status": "ok",
+   "runs": 1,
+   "corpusBytes": 598222,
+   "openMs": 3517,
+   "stages": {
+    "corpus": {
+     "ms": 0,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 5,
+     "domNodes": 25,
+     "rssMB": 109,
+     "bytes": 598222
+    },
+    "boot": {
+     "ms": 140,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 52,
+     "heapMB": 9,
+     "domNodes": 29,
+     "rssMB": 131
+    },
+    "read": {
+     "ms": 3,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 10,
+     "domNodes": 30,
+     "rssMB": 136
+    },
+    "parse": {
+     "ms": 678,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 12,
+     "domNodes": 30,
+     "rssMB": 142,
+     "topLevelBlocks": 2704
+    },
+    "state": {
+     "ms": 42,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 13,
+     "domNodes": 30,
+     "rssMB": 144
+    },
+    "mount": {
+     "ms": 2794,
+     "layoutMs": 94,
+     "styleMs": 24,
+     "scriptMs": 1,
+     "heapMB": 135,
+     "domNodes": 21210,
+     "rssMB": 318
+    },
+    "save": {
+     "ms": 68,
+     "layoutMs": 3,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 136,
+     "domNodes": 21240,
+     "rssMB": 320,
+     "bytes": 471280
+    },
+    "reopen": {
+     "ms": 3906,
+     "layoutMs": 56,
+     "styleMs": 12,
+     "scriptMs": 4,
+     "heapMB": 138,
+     "domNodes": 21215,
+     "rssMB": 335
+    }
+   },
+   "typeP50": 64,
+   "typeP95": 116,
+   "typeLanded": true,
+   "scrollP95": 31.5,
+   "blank": 0,
+   "typingPerKeyMs": {
+    "script": 59,
+    "layout": 3,
+    "style": 0,
+    "task": 68
+   },
+   "arrowWalk": {
+    "presses": 40,
+    "moved": 40
+   },
+   "roundTrip": {
+    "savedBytes": 471280,
+    "originalBytes": 598222,
+    "identical": false
+   },
+   "copyAllChars": 440260,
+   "rssMB": 494,
+   "pageErrors": [],
+   "overBudget": [
+    "openMs",
+    "typeP95"
+   ]
+  },
+  {
+   "id": "react-controlled/all/fixture@fixture",
+   "status": "ok",
+   "runs": 1,
+   "corpusBytes": 598222,
+   "openMs": 2942,
+   "stages": {
+    "corpus": {
+     "ms": 0,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 5,
+     "domNodes": 25,
+     "rssMB": 109,
+     "bytes": 598222
+    },
+    "boot": {
+     "ms": 166,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 69,
+     "heapMB": 9,
+     "domNodes": 29,
+     "rssMB": 132
+    },
+    "read": {
+     "ms": 2,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 10,
+     "domNodes": 30,
+     "rssMB": 136
+    },
+    "parse": {
+     "ms": 554,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 12,
+     "domNodes": 30,
+     "rssMB": 142,
+     "topLevelBlocks": 2704
+    },
+    "state": {
+     "ms": 40,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 13,
+     "domNodes": 30,
+     "rssMB": 144
+    },
+    "mount": {
+     "ms": 2346,
+     "layoutMs": 52,
+     "styleMs": 11,
+     "scriptMs": 1,
+     "heapMB": 135,
+     "domNodes": 21200,
+     "rssMB": 319
+    },
+    "save": {
+     "ms": 81,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 136,
+     "domNodes": 21240,
+     "rssMB": 321,
+     "bytes": 471280
+    },
+    "reopen": {
+     "ms": 3162,
+     "layoutMs": 83,
+     "styleMs": 23,
+     "scriptMs": 6,
+     "heapMB": 141,
+     "domNodes": 42343,
+     "rssMB": 347
+    }
+   },
+   "typeP50": 71,
+   "typeP95": 163,
+   "typeLanded": true,
+   "scrollP95": 31.400000000023283,
+   "blank": 0,
+   "typingPerKeyMs": {
+    "script": 74,
+    "layout": 3,
+    "style": 0,
+    "task": 81
+   },
+   "arrowWalk": {
+    "presses": 40,
+    "moved": 40
+   },
+   "roundTrip": {
+    "savedBytes": 471280,
+    "originalBytes": 598222,
+    "identical": false
+   },
+   "copyAllChars": 440260,
+   "rssMB": 454,
+   "pageErrors": [],
+   "overBudget": [
+    "openMs",
+    "typeP95"
+   ]
+  }
+ ],
+ "raw": [
+  {
+   "scenario": {
+    "id": "full/all/fixture@fixture",
+    "strategy": "full",
+    "plugins": "all",
+    "kind": "fixture",
+    "sizeMB": 0,
+    "view": "app"
+   },
+   "runs": [
+    {
+     "status": "ok",
+     "stages": {
+      "corpus": {
+       "ms": 0,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 598222,
+       "heapMB": 5,
+       "domNodes": 25,
+       "rssMB": 108
+      },
+      "boot": {
+       "ms": 157,
+       "scriptMs": 53,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 132
+      },
+      "read": {
+       "ms": 3,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 134
+      },
+      "parse": {
+       "ms": 717,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "topLevelBlocks": 2704,
+       "docSize": 440503,
+       "mainThreadMaxBlockMs": 718,
+       "heapMB": 11,
+       "domNodes": 29,
+       "rssMB": 140
+      },
+      "state": {
+       "ms": 12,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 12,
+       "domNodes": 29,
+       "rssMB": 140
+      },
+      "mount": {
+       "ms": 153,
+       "scriptMs": 0,
+       "layoutMs": 55,
+       "styleMs": 12,
+       "domNodes": 21175,
+       "heapMB": 15,
+       "rssMB": 177
+      },
+      "save": {
+       "ms": 85,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 471297,
+       "heapMB": 16,
+       "domNodes": 21175,
+       "rssMB": 180
+      },
+      "reopen": {
+       "ms": 580,
+       "scriptMs": 0,
+       "layoutMs": 3,
+       "styleMs": 1,
+       "heapMB": 17,
+       "domNodes": 21240,
+       "rssMB": 183
+      }
+     },
+     "typing": {
+      "start": {
+       "samples": [
+        27,
+        17,
+        19,
+        14,
+        14,
+        14,
+        18,
+        22,
+        19,
+        18,
+        14,
+        28
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 5,
+        "layout": 2,
+        "style": 0,
+        "task": 20
+       }
+      },
+      "middle": {
+       "samples": [
+        35,
+        41,
+        41,
+        38,
+        31,
+        45,
+        36,
+        26,
+        35,
+        42,
+        40,
+        30
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 6,
+        "layout": 5,
+        "style": 0,
+        "task": 36
+       }
+      },
+      "end": {
+       "samples": [
+        32,
+        35,
+        32,
+        32,
+        22,
+        32,
+        32,
+        30,
+        32,
+        22,
+        20,
+        19
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 5,
+        "layout": 2,
+        "style": 0,
+        "task": 28
+       }
+      }
+     },
+     "scroll": [
+      {
+       "fraction": 0.25,
+       "ms": 21.400000000023283,
+       "blank": 0
+      },
+      {
+       "fraction": 0.75,
+       "ms": 30.100000000093132,
+       "blank": 0
+      },
+      {
+       "fraction": 0.5,
+       "ms": 30.300000000046566,
+       "blank": 0
+      },
+      {
+       "fraction": 0.1,
+       "ms": 28.600000000093132,
+       "blank": 0
+      },
+      {
+       "fraction": 0.9,
+       "ms": 29.800000000046566,
+       "blank": 0
+      }
+     ],
+     "pageErrors": [],
+     "roundTrip": {
+      "savedBytes": 471297,
+      "originalBytes": 598222,
+      "identical": false
+     },
+     "copyAllChars": 440260,
+     "arrowWalk": {
+      "presses": 40,
+      "moved": 40
+     },
+     "endRssMB": 236
+    }
+   ]
+  },
+  {
+   "scenario": {
+    "id": "full[view-1.42.3]/all/fixture@fixture",
+    "strategy": "full",
+    "plugins": "all",
+    "kind": "fixture",
+    "sizeMB": 0,
+    "view": "1.42.3"
+   },
+   "runs": [
+    {
+     "status": "ok",
+     "stages": {
+      "corpus": {
+       "ms": 0,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 598222,
+       "heapMB": 5,
+       "domNodes": 25,
+       "rssMB": 109
+      },
+      "boot": {
+       "ms": 158,
+       "scriptMs": 50,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 133
+      },
+      "read": {
+       "ms": 3,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 134
+      },
+      "parse": {
+       "ms": 745,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "topLevelBlocks": 2704,
+       "docSize": 440503,
+       "mainThreadMaxBlockMs": 745,
+       "heapMB": 11,
+       "domNodes": 29,
+       "rssMB": 139
+      },
+      "state": {
+       "ms": 48,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 12,
+       "domNodes": 29,
+       "rssMB": 140
+      },
+      "mount": {
+       "ms": 181,
+       "scriptMs": 0,
+       "layoutMs": 59,
+       "styleMs": 12,
+       "domNodes": 21175,
+       "heapMB": 15,
+       "rssMB": 177
+      },
+      "save": {
+       "ms": 103,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 471297,
+       "heapMB": 16,
+       "domNodes": 21180,
+       "rssMB": 180
+      },
+      "reopen": {
+       "ms": 938,
+       "scriptMs": 0,
+       "layoutMs": 3,
+       "styleMs": 1,
+       "heapMB": 17,
+       "domNodes": 21240,
+       "rssMB": 183
+      }
+     },
+     "typing": {
+      "start": {
+       "samples": [
+        28,
+        19,
+        18,
+        24,
+        34,
+        30,
+        28,
+        19,
+        23,
+        18,
+        17,
+        18
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 9,
+        "layout": 2,
+        "style": 0,
+        "task": 24
+       }
+      },
+      "middle": {
+       "samples": [
+        36,
+        35,
+        33,
+        30,
+        30,
+        33,
+        31,
+        30,
+        31,
+        29,
+        33,
+        31
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 8,
+        "layout": 3,
+        "style": 0,
+        "task": 32
+       }
+      },
+      "end": {
+       "samples": [
+        33,
+        26,
+        31,
+        31,
+        21,
+        21,
+        21,
+        29,
+        24,
+        24,
+        21,
+        22
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 8,
+        "layout": 2,
+        "style": 0,
+        "task": 25
+       }
+      }
+     },
+     "scroll": [
+      {
+       "fraction": 0.25,
+       "ms": 24.29999999993015,
+       "blank": 0
+      },
+      {
+       "fraction": 0.75,
+       "ms": 30.699999999953434,
+       "blank": 0
+      },
+      {
+       "fraction": 0.5,
+       "ms": 31.20000000006985,
+       "blank": 0
+      },
+      {
+       "fraction": 0.1,
+       "ms": 31.300000000046566,
+       "blank": 0
+      },
+      {
+       "fraction": 0.9,
+       "ms": 31,
+       "blank": 0
+      }
+     ],
+     "pageErrors": [],
+     "roundTrip": {
+      "savedBytes": 471297,
+      "originalBytes": 598222,
+      "identical": false
+     },
+     "copyAllChars": 440260,
+     "arrowWalk": {
+      "presses": 40,
+      "moved": 40
+     },
+     "endRssMB": 235
+    }
+   ]
+  },
+  {
+   "scenario": {
+    "id": "react/all/fixture@fixture",
+    "strategy": "react",
+    "plugins": "all",
+    "kind": "fixture",
+    "sizeMB": 0,
+    "view": "1.42.3"
+   },
+   "runs": [
+    {
+     "status": "ok",
+     "stages": {
+      "corpus": {
+       "ms": 0,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 598222,
+       "heapMB": 5,
+       "domNodes": 25,
+       "rssMB": 109
+      },
+      "boot": {
+       "ms": 140,
+       "scriptMs": 52,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 131
+      },
+      "read": {
+       "ms": 3,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 10,
+       "domNodes": 30,
+       "rssMB": 136
+      },
+      "parse": {
+       "ms": 678,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "topLevelBlocks": 2704,
+       "docSize": 440503,
+       "heapMB": 12,
+       "domNodes": 30,
+       "rssMB": 142
+      },
+      "state": {
+       "ms": 42,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 13,
+       "domNodes": 30,
+       "rssMB": 144
+      },
+      "mount": {
+       "ms": 2794,
+       "scriptMs": 1,
+       "layoutMs": 94,
+       "styleMs": 24,
+       "domNodes": 21210,
+       "heapMB": 135,
+       "rssMB": 318
+      },
+      "save": {
+       "ms": 68,
+       "scriptMs": 0,
+       "layoutMs": 3,
+       "styleMs": 0,
+       "bytes": 471280,
+       "heapMB": 136,
+       "domNodes": 21240,
+       "rssMB": 320
+      },
+      "reopen": {
+       "ms": 3906,
+       "scriptMs": 4,
+       "layoutMs": 56,
+       "styleMs": 12,
+       "heapMB": 138,
+       "domNodes": 21215,
+       "rssMB": 335
+      }
+     },
+     "typing": {
+      "start": {
+       "samples": [
+        116,
+        150,
+        109,
+        93,
+        76,
+        81,
+        87,
+        87,
+        88,
+        45,
+        68,
+        69
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 79,
+        "layout": 2,
+        "style": 0,
+        "task": 87
+       }
+      },
+      "middle": {
+       "samples": [
+        72,
+        65,
+        63,
+        64,
+        63,
+        55,
+        84,
+        96,
+        87,
+        64,
+        40,
+        42
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 59,
+        "layout": 3,
+        "style": 0,
+        "task": 68
+       }
+      },
+      "end": {
+       "samples": [
+        41,
+        37,
+        61,
+        55,
+        39,
+        38,
+        44,
+        40,
+        41,
+        62,
+        42,
+        79
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 41,
+        "layout": 2,
+        "style": 0,
+        "task": 48
+       }
+      }
+     },
+     "scroll": [
+      {
+       "fraction": 0.25,
+       "ms": 17.800000000046566,
+       "blank": 0
+      },
+      {
+       "fraction": 0.75,
+       "ms": 31.29999999993015,
+       "blank": 0
+      },
+      {
+       "fraction": 0.5,
+       "ms": 31.099999999976717,
+       "blank": 0
+      },
+      {
+       "fraction": 0.1,
+       "ms": 31.5,
+       "blank": 0
+      },
+      {
+       "fraction": 0.9,
+       "ms": 31.300000000046566,
+       "blank": 0
+      }
+     ],
+     "pageErrors": [],
+     "roundTrip": {
+      "savedBytes": 471280,
+      "originalBytes": 598222,
+      "identical": false
+     },
+     "copyAllChars": 440260,
+     "arrowWalk": {
+      "presses": 40,
+      "moved": 40
+     },
+     "endRssMB": 494
+    }
+   ]
+  },
+  {
+   "scenario": {
+    "id": "react-controlled/all/fixture@fixture",
+    "strategy": "react-controlled",
+    "plugins": "all",
+    "kind": "fixture",
+    "sizeMB": 0,
+    "view": "1.42.3"
+   },
+   "runs": [
+    {
+     "status": "ok",
+     "stages": {
+      "corpus": {
+       "ms": 0,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 598222,
+       "heapMB": 5,
+       "domNodes": 25,
+       "rssMB": 109
+      },
+      "boot": {
+       "ms": 166,
+       "scriptMs": 69,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 132
+      },
+      "read": {
+       "ms": 2,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 10,
+       "domNodes": 30,
+       "rssMB": 136
+      },
+      "parse": {
+       "ms": 554,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "topLevelBlocks": 2704,
+       "docSize": 440503,
+       "heapMB": 12,
+       "domNodes": 30,
+       "rssMB": 142
+      },
+      "state": {
+       "ms": 40,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 13,
+       "domNodes": 30,
+       "rssMB": 144
+      },
+      "mount": {
+       "ms": 2346,
+       "scriptMs": 1,
+       "layoutMs": 52,
+       "styleMs": 11,
+       "domNodes": 21200,
+       "heapMB": 135,
+       "rssMB": 319
+      },
+      "save": {
+       "ms": 81,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 471280,
+       "heapMB": 136,
+       "domNodes": 21240,
+       "rssMB": 321
+      },
+      "reopen": {
+       "ms": 3162,
+       "scriptMs": 6,
+       "layoutMs": 83,
+       "styleMs": 23,
+       "heapMB": 141,
+       "domNodes": 42343,
+       "rssMB": 347
+      }
+     },
+     "typing": {
+      "start": {
+       "samples": [
+        163,
+        106,
+        92,
+        90,
+        104,
+        102,
+        94,
+        71,
+        50,
+        59,
+        70,
+        68
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 81,
+        "layout": 2,
+        "style": 0,
+        "task": 95
+       }
+      },
+      "middle": {
+       "samples": [
+        57,
+        53,
+        48,
+        73,
+        46,
+        44,
+        119,
+        164,
+        143,
+        103,
+        71,
+        57
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 74,
+        "layout": 3,
+        "style": 0,
+        "task": 81
+       }
+      },
+      "end": {
+       "samples": [
+        55,
+        58,
+        42,
+        44,
+        43,
+        46,
+        122,
+        99,
+        90,
+        111,
+        62,
+        42
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 62,
+        "layout": 2,
+        "style": 0,
+        "task": 68
+       }
+      }
+     },
+     "scroll": [
+      {
+       "fraction": 0.25,
+       "ms": 30.300000000046566,
+       "blank": 0
+      },
+      {
+       "fraction": 0.75,
+       "ms": 30,
+       "blank": 0
+      },
+      {
+       "fraction": 0.5,
+       "ms": 31.199999999953434,
+       "blank": 0
+      },
+      {
+       "fraction": 0.1,
+       "ms": 31.400000000023283,
+       "blank": 0
+      },
+      {
+       "fraction": 0.9,
+       "ms": 29.900000000023283,
+       "blank": 0
+      }
+     ],
+     "pageErrors": [],
+     "roundTrip": {
+      "savedBytes": 471280,
+      "originalBytes": 598222,
+      "identical": false
+     },
+     "copyAllChars": 440260,
+     "arrowWalk": {
+      "presses": 40,
+      "moved": 40
+     },
+     "endRssMB": 454
+    }
+   ]
+  }
+ ]
+}
