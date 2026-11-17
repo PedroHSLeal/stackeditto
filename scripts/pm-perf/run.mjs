@@ -8,7 +8,13 @@
 //   npm run perf:pm -- --timeout 900      seconds allowed per scenario run
 //   npm run perf:pm -- --no-highlight     drop the code-block highlight plugins (full and incremental)
 //   npm run perf:pm -- --suite experiments  viewport highlight, spellcheck off, parse in a worker, parse-bound sizes
+//   npm run perf:pm -- --suite react      app editor vs @handlewithcare/react-prosemirror (branch react-prosemirror)
+//   npm run perf:pm -- --suite react-full the react suite plus 32 MB
+//   npm run perf:pm -- --react-dev        React's development build on the react server (default: production,
+//                                         which is what users get; the dev build is several times slower)
 //   npm run perf:pm -- --channel chromium full Chromium (new headless) instead of the headless shell
+//   npm run perf:pm -- --executable <path>  browser binary to launch (or env PM_PERF_CHROMIUM), when the
+//                                         Playwright-managed browser for this version is not installed
 //   npm run perf:pm -- --force-optimize   re-bundle dependencies first (after changing node_modules)
 //   npm run perf:pm -- --profile          save a CPU profile of typing (open it in DevTools)
 //   npm run perf:pm -- --strict           exit 1 if a scenario crashes, or if an
@@ -23,6 +29,8 @@ import { createServer } from "vite";
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(`--${name}`);
 const option = (name, fallback) => (args.includes(`--${name}`) ? args[args.indexOf(`--${name}`) + 1] : fallback);
+
+const launchOptions = (extra = {}) => ({ channel: option("channel", undefined), executablePath: option("executable", process.env.PM_PERF_CHROMIUM), ...extra });
 
 const BUDGETS = {
   openMs: { limit: 1000, label: "open (read to first paint)" },
@@ -45,9 +53,38 @@ const STRATEGIES = [
   ["monaco", "none"],
 ];
 
+const isReact = (strategy) => strategy.startsWith("react");
+
 function scenario(strategy, plugins, kind, sizeMB, extra = {}) {
+  // react-prosemirror pins prosemirror-view 1.42.3, so its scenarios (and the vanilla baseline on the same
+  // version) run on a second dev server in mode "playground-react" (see vite.config.ts).
+  const view = isReact(strategy) ? "1.42.3" : extra.view ?? "app";
   const tags = [extra.noSpellcheck && "+nospell", extra.parseInWorker && "+worker"].filter(Boolean).join("");
-  return { id: `${strategy}/${plugins}/${kind}@${sizeMB || "fixture"}${tags}`, strategy, plugins, kind, sizeMB, ...(flag("no-highlight") && { noHighlight: true }), ...extra };
+  const label = view == "1.42.3" && !isReact(strategy) ? `${strategy}[view-1.42.3]` : strategy;
+  return { id: `${label}/${plugins}/${kind}@${sizeMB || "fixture"}${tags}`, strategy, plugins, kind, sizeMB, ...(flag("no-highlight") && { noHighlight: true }), ...extra, view };
+}
+
+/**
+ * The app's editor against @handlewithcare/react-prosemirror, on every corpus:
+ *   full                 the app today: prosemirror-view 1.41.0 + the patches in patches/
+ *   full[view-1.42.3]    the same vanilla EditorView on the stock 1.42.3 react-prosemirror pins (fair baseline)
+ *   react                react-prosemirror, uncontrolled (defaultState), as react-pm/ uses it
+ *   react-controlled     react-prosemirror, state lifted into a parent useState
+ */
+function reactSuite(name) {
+  const list = [];
+  const contenders = [["full", {}], ["full", { view: "1.42.3" }], ["react", {}], ["react-controlled", {}]];
+  const corpora = [["fixture", 0], ["fixture", 2], ["prose", 2], ["lists", 2], ["tables", 2], ["fenced", 2], ["html", 2], ["giant-block", 2], ["fixture", 8]];
+
+  for (const [kind, size] of corpora) {
+    for (const [strategy, extra] of contenders) list.push(scenario(strategy, "all", kind, size, extra));
+  }
+
+  if (name == "react-full") {
+    for (const [strategy, extra] of contenders) list.push(scenario(strategy, "all", "fixture", 32, extra));
+  }
+
+  return list;
 }
 
 /** Follow-ups from the 2026-11 research: deps upgrade, viewport highlight, spellcheck, parse in a worker. */
@@ -82,6 +119,7 @@ function experimentsSuite() {
 
 function buildSuite(name) {
   if (name == "experiments") return experimentsSuite();
+  if (name == "react" || name == "react-full") return reactSuite(name);
   const list = [];
 
   // 1. What does each add-on cost on the real fixture?
@@ -144,7 +182,7 @@ const median = (values) => quantile(values.filter((v) => v != null), 0.5);
 
 async function runOnce(url, sc, timeoutMs) {
   const result = { status: "ok", stages: {}, typing: {}, scroll: [] };
-  const browser = await chromium.launch({ channel: option("channel", undefined), args: ["--enable-precise-memory-info"] });
+  const browser = await chromium.launch(launchOptions({ args: ["--enable-precise-memory-info"] }));
 
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
@@ -338,7 +376,7 @@ function summarize(sc, runs) {
 const fmt = (value, unit = "") => (value == null ? "–" : `${Math.round(value).toLocaleString("en-US")}${unit}`);
 
 function writeReport(path, meta, summaries) {
-  const lines = [`# ProseMirror performance run`, ``, `${meta.date} · suite \`${meta.suite}\` · ${meta.browser}${meta.noHighlight ? " · **highlight plugins disabled** (--no-highlight)" : ""}`, ``];
+  const lines = [`# ProseMirror performance run`, ``, `${meta.date} · suite \`${meta.suite}\` · ${meta.browser}${meta.noHighlight ? " · **highlight plugins disabled** (--no-highlight)" : ""}${summaries.some((s) => s.id.startsWith("react")) ? ` · React ${meta.reactBuild} build` : ""}`, ``];
 
   lines.push(`Budgets: ${Object.values(BUDGETS).map((b) => `${b.label} ≤ ${b.limit}`).join(" · ")}. Over-budget values are in **bold**.`, ``);
   lines.push(`| scenario | status | MB | open ms | parse | state | mount | layout+style | save | reopen | type p50 | type p95 | scroll p95 | blank | arrow walk | renderer MB | JS heap MB | DOM nodes |`);
@@ -381,29 +419,54 @@ async function main() {
     return;
   }
 
-  const server = await createServer({
-    configFile: "vite.config.ts",
-    mode: "playground",
-    logLevel: "error",
-    server: { port: 5199, fs: { strict: false } },
-    // --force-optimize: re-bundle dependencies, e.g. after swapping a package version in node_modules.
-    optimizeDeps: { entries: ["pm-perf/index.html"], force: flag("force-optimize") },
-  });
-  await server.listen();
+  const startServer = async (mode, port) => {
+    // Vite's dev server sets NODE_ENV to the mode name, so React (and react-prosemirror's own checks) would
+    // run their development builds. Vanilla ProseMirror has no such switch, so measure React as shipped.
+    const production = mode == "playground-react" && !flag("react-dev");
+    const nodeEnv = { "process.env.NODE_ENV": JSON.stringify("production") };
 
-  const url = `${server.resolvedUrls.local[0]}pm-perf/`;
+    const server = await createServer({
+      configFile: "vite.config.ts",
+      mode,
+      logLevel: "error",
+      server: { port, fs: { strict: false } },
+      ...(production && { define: nodeEnv }),
+      // --force-optimize: re-bundle dependencies, e.g. after swapping a package version in node_modules.
+      optimizeDeps: { entries: ["pm-perf/index.html"], force: flag("force-optimize") || mode == "playground-react", ...(production && { esbuildOptions: { define: nodeEnv } }) },
+    });
+    await server.listen();
+    return server;
+  };
+
+  const servers = [];
+  const urls = {};
 
   // Let Vite discover and pre-bundle everything now: a dependency found mid-run reloads the page.
   console.log("warming up the dev server...");
-  for (const strategy of ["full", "chunked", "monaco"]) {
-    await runOnce(url, scenario(strategy, strategy == "monaco" ? "none" : "all", "prose", 0.05), 240_000);
+
+  if (scenarios.some((s) => s.view != "1.42.3")) {
+    const server = await startServer("playground", 5199);
+    servers.push(server);
+    urls.app = `${server.resolvedUrls.local[0]}pm-perf/`;
+    for (const strategy of ["full", "chunked", "monaco"]) {
+      await runOnce(urls.app, scenario(strategy, strategy == "monaco" ? "none" : "all", "prose", 0.05), 240_000);
+    }
+  }
+
+  if (scenarios.some((s) => s.view == "1.42.3")) {
+    const server = await startServer("playground-react", 5198);
+    servers.push(server);
+    urls["1.42.3"] = `${server.resolvedUrls.local[0]}pm-perf/`;
+    for (const strategy of ["full", "react", "react-controlled"]) {
+      await runOnce(urls["1.42.3"], scenario(strategy, "all", "prose", 0.05, { view: "1.42.3" }), 240_000);
+    }
   }
 
   if (!existsSync("perf-results")) mkdirSync("perf-results");
 
   const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-  const browser = await chromium.launch({ channel: option("channel", undefined) });
-  const meta = { date: new Date().toISOString(), suite, browser: `Chromium ${browser.version()} headless${option("channel", "") ? ` (channel ${option("channel")})` : ""}`, cpus: (await import("node:os")).cpus().length, noHighlight: flag("no-highlight") };
+  const browser = await chromium.launch(launchOptions());
+  const meta = { date: new Date().toISOString(), suite, reactBuild: flag("react-dev") ? "development" : "production", browser: `Chromium ${browser.version()} headless${option("channel", "") ? ` (channel ${option("channel")})` : ""}`, cpus: (await import("node:os")).cpus().length, noHighlight: flag("no-highlight") };
   await browser.close();
 
   const summaries = [];
@@ -414,7 +477,7 @@ async function main() {
     const timeoutMs = Number(option("timeout", sc.timeoutSec ?? (sc.sizeMB >= 32 ? 600 : 300))) * 1000;
     const runs = [];
 
-    for (let i = 0; i < repeat; i++) runs.push(await runOnce(url, sc, timeoutMs));
+    for (let i = 0; i < repeat; i++) runs.push(await runOnce(urls[sc.view], sc, timeoutMs));
 
     const summary = summarize(sc, runs);
     summaries.push(summary);
@@ -427,7 +490,7 @@ async function main() {
     writeReport(`perf-results/${stamp}.md`, meta, summaries);
   }
 
-  await server.close();
+  for (const server of servers) await server.close();
 
   console.log(`\nreport: perf-results/${stamp}.md`);
 

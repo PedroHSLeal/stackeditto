@@ -4,7 +4,9 @@ export type PluginSet = "none" | "input-rules" | "keymaps" | "cursors" | "highli
 
 export type Scenario = {
   id: string;
-  strategy: "full" | "content-visibility" | "pm-window" | "chunked" | "monaco";
+  strategy: "full" | "content-visibility" | "pm-window" | "chunked" | "monaco" | "react" | "react-controlled";
+  /** "1.42.3": runs on the playground-react server (prosemirror-view 1.42.3, unpatched), which react-prosemirror requires. */
+  view?: "app" | "1.42.3";
   plugins: PluginSet;
   kind: CorpusKind;
   sizeMB: number;

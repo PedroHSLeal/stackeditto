@@ -164,3 +164,6 @@ perf-results
 
 # Claude Code worktrees
 .claude/worktrees
+
+# build do módulo experimental react-pm (npm run react-pm:build)
+dist-react-pm

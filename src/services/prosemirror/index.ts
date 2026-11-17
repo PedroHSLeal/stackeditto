@@ -22,7 +22,8 @@ export const defaultNodeViews: { [node: string]: NodeViewConstructor } = {
 };
 
 // Só dependem do schema (fixo), então são criados uma vez e compartilhados por todos os states.
-const plugins = [
+// Exportada para o módulo react-pm (branch react-prosemirror) montar o mesmo state com o plugin reactKeys().
+export const defaultPlugins = [
   buildInputRules(mySchema),
 
   keymap(baseKeymap),
@@ -43,10 +44,15 @@ export function buildProsemirrorView(element: Element, state: EditorState, nodeV
   return defaultView;
 }
 
+/** Para views que não nascem em buildProsemirrorView (ex.: a do react-prosemirror): executeCommand/getProsemirrorText sem view passam a usá-la. */
+export function setDefaultView(view: EditorView) {
+  defaultView = view;
+}
+
 export async function buildProsemirrorState(content: Value) {
   return EditorState.create({
     doc: await markdownToProseMirror(content),
-    plugins,
+    plugins: defaultPlugins,
   })
 }
 

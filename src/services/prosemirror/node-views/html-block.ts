@@ -18,7 +18,7 @@ export const HTML_BLOCK_PLACEHOLDER = {
 };
 
 export class HtmlBlockView implements NodeView {
-  dom: InstanceType<typeof window.Node>;
+  dom: HTMLElement;
 
   constructor(node: Node, view: EditorView, getPos: () => number | undefined, decorations: readonly Decoration[], innerDecorations: DecorationSource) {
     const { tag, attrs, content } = node.attrs.params;

@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "playground": "vite --mode playground",
+    "react-pm": "vite --mode react-pm",
+    "react-pm:build": "vite build --mode react-pm",
+    "react-pm:preview": "vite preview --mode react-pm",
     "build": "run-p type-check \"build-only {@}\" --",
     "new-playground": "node scripts/new-playground/index.mjs",
     "preview": "vite preview",
@@ -16,6 +19,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@handlewithcare/react-prosemirror": "3.3.0",
     "@handlewithcare/remark-prosemirror": "^0.1.5",
     "@vueuse/core": "^12.7.0",
     "browser-fs-access": "^0.38.0",
@@ -39,7 +43,11 @@
     "prosemirror-transform": "^1.10.3",
     "prosemirror-utils": "^1.2.2",
     "prosemirror-view": "^1.38.1",
+    "prosemirror-view-react": "npm:prosemirror-view@1.42.3",
     "prosemirror-virtual-cursor": "^0.4.2",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "react-reconciler": "0.32.0",
     "rehype-stringify": "^10.0.1",
     "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^4.0.1",
@@ -56,7 +64,10 @@
     "@types/jest": "^29.5.14",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.9.3",
+    "@types/react": "19.1.12",
+    "@types/react-dom": "19.1.9",
     "@types/wicg-file-system-access": "^2023.10.5",
+    "@vitejs/plugin-react": "4.7.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitejs/plugin-vue-jsx": "^4.1.1",
     "@vue/test-utils": "^2.4.6",
@@ -73,5 +84,10 @@
     "vite-plugin-vue-devtools": "^7.6.5",
     "vitest": "^2.1.5",
     "vue-tsc": "^2.1.10"
+  },
+  "overrides": {
+    "@handlewithcare/react-prosemirror": {
+      "prosemirror-view": "$prosemirror-view"
+    }
   }
 }

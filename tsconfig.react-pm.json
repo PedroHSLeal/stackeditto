@@ -1,0 +1,21 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": ["env.d.ts", "react-pm/**/*", "src/services/**/*", "src/models/**/*", "src/templates/**/*", "src/assets/*.json"],
+  "exclude": ["src/**/*.spec.ts", "src/services/file-system/conformance/**"],
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.react-pm.tsbuildinfo",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "types": ["@types/wicg-file-system-access"],
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+
+    "paths": {
+      "@/*": ["./src/*"],
+      "~/*": ["./node_modules/*"],
+      "<md>/*": ["./md/*"],
+      "<p>/*": ["./playground/*"],
+      "prosemirror-view": ["./node_modules/prosemirror-view-react"]
+    }
+  }
+}

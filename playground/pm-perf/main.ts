@@ -51,6 +51,9 @@ const api = {
     if (scenario.strategy == "monaco") {
       const { openMonaco } = await import("./strategies/monaco");
       session = await openMonaco(file, stage, scroller, mount);
+    } else if (scenario.strategy == "react" || scenario.strategy == "react-controlled") {
+      const { openReact } = await import("./strategies/react");
+      session = await openReact(file, scenario, stage, scroller, mount);
     } else if (scenario.strategy == "chunked") {
       const { openChunked } = await import("./strategies/chunked");
       session = await openChunked(file, scenario, stage, scroller, mount);
