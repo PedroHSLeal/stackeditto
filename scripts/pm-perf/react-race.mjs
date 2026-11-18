@@ -77,6 +77,8 @@ for (const editor of EDITORS) {
 
     for (const pause of PAUSES) {
       const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+      // The harness page reports each stage to run.mjs; here nobody is timing, so the bindings are no-ops.
+      await page.addInitScript(() => { window.__stageStart = async () => { }; window.__stageEnd = async () => { }; });
       await page.goto(`${servers[editor.mode].resolvedUrls.local[0]}pm-perf/`);
       await page.waitForFunction(() => window.__perf);
       await page.evaluate((sc) => window.__perf.open(sc), { id: "race", strategy: editor.strategy, plugins: "all", kind: "prose", sizeMB: 0.02, view: editor.view });
