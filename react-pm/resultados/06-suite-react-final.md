@@ -17,6 +17,7 @@ Budgets: open (read to first paint) ≤ 1000 · typing p95 ≤ 50 · scroll sett
 | full/all/html@2 | ok | 2.0 | **3,556** | 2,671 | 5 | 874 | 562 | 5,781 | 2,731 | 157 | **249** | **156** | 0.00 | 40/40 | 493 | 30 | 124,030 |
 | full[view-1.42.3]/all/html@2 | ok | 2.0 | **3,236** | 2,462 | 8 | 761 | 395 | 5,959 | 2,427 | 147 | **262** | **149** | 0.00 | 40/40 | 491 | 30 | 124,030 |
 | react/all/html@2 | timeout,timeout,timeout | 2.0 | – | 2,484 | 115 | – | – | – | – | – | – | – | – | – | **1,772** | – | – |
+| react-controlled/all/html@2 | timeout,timeout,timeout | 2.0 | – | 2,448 | 122 | – | – | – | – | – | – | – | – | – | **1,770** | – | – |
 
 ## Notes
 
@@ -31,3 +32,4 @@ Budgets: open (read to first paint) ≤ 1000 · typing p95 ≤ 50 · scroll sett
 - `full/all/html@2`: some keystrokes did not land in the document; saving unedited changes the file: 2,105,520 → 2,155,119 bytes
 - `full[view-1.42.3]/all/html@2`: some keystrokes did not land in the document; saving unedited changes the file: 2,105,520 → 2,155,119 bytes
 - `react/all/html@2`: failed: __timeout__
+- `react-controlled/all/html@2`: failed: __timeout__
