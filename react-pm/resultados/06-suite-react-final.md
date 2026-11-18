@@ -14,6 +14,7 @@ Budgets: open (read to first paint) ≤ 1000 · typing p95 ≤ 50 · scroll sett
 | full[view-1.42.3]/all/fenced@2 | ok | 2.0 | **35,126** | 1,428 | 29,059 | 4,633 | 1,428 | 301 | 30,519 | 1,288 | **1,809** | **103** | 0.00 | 40/40 | **1,279** | 143 | 871,130 |
 | react/all/fenced@2 | ok | 2.0 | **84,580** | 1,228 | 28,518 | 54,829 | 2,795 | 415 | 109,501 | 1,224 | **1,674** | **106** | 0.00 | 40/40 | **2,673** | 1,160 | 871,134 |
 | react-controlled/all/fenced@2 | ok | 2.0 | **83,677** | 1,327 | 28,037 | 54,308 | 2,813 | 401 | 109,236 | 1,243 | **1,772** | **106** | 0.00 | 33/33 | **2,674** | 1,160 | 871,134 |
+| full/all/html@2 | ok | 2.0 | **3,556** | 2,671 | 5 | 874 | 562 | 5,781 | 2,731 | 157 | **249** | **156** | 0.00 | 40/40 | 493 | 30 | 124,030 |
 
 ## Notes
 
@@ -25,3 +26,4 @@ Budgets: open (read to first paint) ≤ 1000 · typing p95 ≤ 50 · scroll sett
 - `full[view-1.42.3]/all/fenced@2`: saving unedited changes the file: 2,079,790 → 2,079,789 bytes
 - `react/all/fenced@2`: saving unedited changes the file: 2,079,790 → 2,079,789 bytes
 - `react-controlled/all/fenced@2`: saving unedited changes the file: 2,079,790 → 2,079,789 bytes
+- `full/all/html@2`: some keystrokes did not land in the document; saving unedited changes the file: 2,105,520 → 2,155,119 bytes
