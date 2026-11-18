@@ -74,7 +74,9 @@ function scenario(strategy, plugins, kind, sizeMB, extra = {}) {
 function reactSuite(name) {
   const list = [];
   const contenders = [["full", {}], ["full", { view: "1.42.3" }], ["react", {}], ["react-controlled", {}]];
-  const corpora = [["fixture", 0], ["fixture", 2], ["prose", 2], ["lists", 2], ["tables", 2], ["fenced", 2], ["html", 2], ["giant-block", 2], ["fixture", 8]];
+  // Tables at 0.25 MB: at 2 MB the shared markdown parser (micromark-extension-gfm-table) does not finish in
+  // 5 minutes, before any editor is involved, so every variant would only time out.
+  const corpora = [["fixture", 0], ["fixture", 2], ["prose", 2], ["lists", 2], ["tables", 0.25], ["fenced", 2], ["html", 2], ["giant-block", 2], ["fixture", 8]];
 
   for (const [kind, size] of corpora) {
     for (const [strategy, extra] of contenders) list.push(scenario(strategy, "all", kind, size, extra));
