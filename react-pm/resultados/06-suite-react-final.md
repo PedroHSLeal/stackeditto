@@ -12,6 +12,7 @@ Budgets: open (read to first paint) ≤ 1000 · typing p95 ≤ 50 · scroll sett
 | react-controlled/all/tables@0.25 | ok | 0.2 | **11,116** | 8,380 | 29 | 2,706 | 118 | error | 12,291 | 90 | **117** | 32 | 0.00 | 40/40 | 612 | 265 | 26,434 |
 | full/all/fenced@2 | ok | 2.0 | **20,508** | 1,318 | 15,060 | 4,125 | 1,322 | 283 | 16,154 | 810 | **1,015** | 97 | 0.00 | 40/40 | **1,302** | 144 | 871,130 |
 | full[view-1.42.3]/all/fenced@2 | ok | 2.0 | **35,126** | 1,428 | 29,059 | 4,633 | 1,428 | 301 | 30,519 | 1,288 | **1,809** | **103** | 0.00 | 40/40 | **1,279** | 143 | 871,130 |
+| react/all/fenced@2 | ok | 2.0 | **84,580** | 1,228 | 28,518 | 54,829 | 2,795 | 415 | 109,501 | 1,224 | **1,674** | **106** | 0.00 | 40/40 | **2,673** | 1,160 | 871,134 |
 
 ## Notes
 
@@ -21,3 +22,4 @@ Budgets: open (read to first paint) ≤ 1000 · typing p95 ≤ 50 · scroll sett
 - `react-controlled/all/tables@0.25`: save failed: Cannot handle unknown node `table`
 - `full/all/fenced@2`: saving unedited changes the file: 2,079,790 → 2,079,789 bytes
 - `full[view-1.42.3]/all/fenced@2`: saving unedited changes the file: 2,079,790 → 2,079,789 bytes
+- `react/all/fenced@2`: saving unedited changes the file: 2,079,790 → 2,079,789 bytes
