@@ -345,6 +345,119 @@
     "scrollP95",
     "rssMB"
    ]
+  },
+  {
+   "id": "react-controlled/all/lists@2",
+   "status": "ok",
+   "runs": 3,
+   "corpusBytes": 2171400,
+   "openMs": 114535,
+   "stages": {
+    "corpus": {
+     "ms": 0,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 5,
+     "domNodes": 25,
+     "rssMB": 110,
+     "bytes": 2171400
+    },
+    "boot": {
+     "ms": 172,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 51,
+     "heapMB": 9,
+     "domNodes": 29,
+     "rssMB": 132
+    },
+    "read": {
+     "ms": 5,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 10,
+     "domNodes": 30,
+     "rssMB": 136
+    },
+    "parse": {
+     "ms": 4710,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 21,
+     "domNodes": 30,
+     "rssMB": 153,
+     "topLevelBlocks": 1
+    },
+    "state": {
+     "ms": 94,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 26,
+     "domNodes": 30,
+     "rssMB": 160
+    },
+    "mount": {
+     "ms": 109726,
+     "layoutMs": 489,
+     "styleMs": 173,
+     "scriptMs": 1,
+     "heapMB": 891,
+     "domNodes": 112035,
+     "rssMB": 1572
+    },
+    "save": {
+     "ms": 1617,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 894,
+     "domNodes": 112035,
+     "rssMB": 1530,
+     "bytes": 2252599
+    },
+    "reopen": {
+     "ms": 132128,
+     "layoutMs": 449,
+     "styleMs": 127,
+     "scriptMs": 91,
+     "heapMB": 906,
+     "domNodes": 112035,
+     "rssMB": 1655
+    }
+   },
+   "typeP50": 353,
+   "typeP95": 486,
+   "typeLanded": true,
+   "scrollP95": 100.80000000004657,
+   "blank": 0,
+   "typingPerKeyMs": {
+    "script": 269,
+    "layout": 23,
+    "style": 0,
+    "task": 327
+   },
+   "arrowWalk": {
+    "presses": 40,
+    "moved": 40
+   },
+   "roundTrip": {
+    "savedBytes": 2252599,
+    "originalBytes": 2171400,
+    "identical": false
+   },
+   "copyAllChars": 2140598,
+   "rssMB": 1947,
+   "pageErrors": [],
+   "overBudget": [
+    "openMs",
+    "typeP95",
+    "scrollP95",
+    "rssMB"
+   ]
   }
  ],
  "raw": [
@@ -1999,6 +2112,591 @@
       "moved": 40
      },
      "endRssMB": 1945
+    }
+   ]
+  },
+  {
+   "scenario": {
+    "id": "react-controlled/all/lists@2",
+    "strategy": "react-controlled",
+    "plugins": "all",
+    "kind": "lists",
+    "sizeMB": 2,
+    "view": "1.42.3"
+   },
+   "runs": [
+    {
+     "status": "ok",
+     "stages": {
+      "corpus": {
+       "ms": 0,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 2171400,
+       "heapMB": 5,
+       "domNodes": 25,
+       "rssMB": 110
+      },
+      "boot": {
+       "ms": 172,
+       "scriptMs": 51,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 132
+      },
+      "read": {
+       "ms": 5,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 10,
+       "domNodes": 30,
+       "rssMB": 135
+      },
+      "parse": {
+       "ms": 4722,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "topLevelBlocks": 1,
+       "docSize": 2196602,
+       "heapMB": 21,
+       "domNodes": 30,
+       "rssMB": 153
+      },
+      "state": {
+       "ms": 94,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 26,
+       "domNodes": 30,
+       "rssMB": 160
+      },
+      "mount": {
+       "ms": 114770,
+       "scriptMs": 1,
+       "layoutMs": 395,
+       "styleMs": 173,
+       "domNodes": 112035,
+       "heapMB": 891,
+       "rssMB": 1566
+      },
+      "save": {
+       "ms": 1617,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 2252599,
+       "heapMB": 894,
+       "domNodes": 112035,
+       "rssMB": 1528
+      },
+      "reopen": {
+       "ms": 132128,
+       "scriptMs": 91,
+       "layoutMs": 361,
+       "styleMs": 105,
+       "heapMB": 906,
+       "domNodes": 112035,
+       "rssMB": 1655
+      }
+     },
+     "typing": {
+      "start": {
+       "samples": [
+        491,
+        441,
+        358,
+        307,
+        324,
+        441,
+        1360,
+        476,
+        309,
+        335,
+        296,
+        310
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 377,
+        "layout": 27,
+        "style": 0,
+        "task": 444
+       }
+      },
+      "middle": {
+       "samples": [
+        403,
+        318,
+        273,
+        358,
+        347,
+        367,
+        310,
+        357,
+        292,
+        370,
+        342,
+        273
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 269,
+        "layout": 23,
+        "style": 0,
+        "task": 327
+       }
+      },
+      "end": {
+       "samples": [
+        350,
+        362,
+        344,
+        380,
+        367,
+        391,
+        306,
+        371,
+        325,
+        291,
+        321,
+        391
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 285,
+        "layout": 25,
+        "style": 0,
+        "task": 344
+       }
+      }
+     },
+     "scroll": [
+      {
+       "fraction": 0.25,
+       "ms": 98.30000000004657,
+       "blank": 0
+      },
+      {
+       "fraction": 0.75,
+       "ms": 84.9000000001397,
+       "blank": 0
+      },
+      {
+       "fraction": 0.5,
+       "ms": 96.80000000004657,
+       "blank": 0
+      },
+      {
+       "fraction": 0.1,
+       "ms": 98,
+       "blank": 0
+      },
+      {
+       "fraction": 0.9,
+       "ms": 77.5,
+       "blank": 0
+      }
+     ],
+     "pageErrors": [],
+     "roundTrip": {
+      "savedBytes": 2252599,
+      "originalBytes": 2171400,
+      "identical": false
+     },
+     "copyAllChars": 2140598,
+     "arrowWalk": {
+      "presses": 40,
+      "moved": 40
+     },
+     "endRssMB": 1942
+    },
+    {
+     "status": "ok",
+     "stages": {
+      "corpus": {
+       "ms": 0,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 2171400,
+       "heapMB": 5,
+       "domNodes": 25,
+       "rssMB": 110
+      },
+      "boot": {
+       "ms": 150,
+       "scriptMs": 45,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 132
+      },
+      "read": {
+       "ms": 6,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 10,
+       "domNodes": 30,
+       "rssMB": 136
+      },
+      "parse": {
+       "ms": 4494,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "topLevelBlocks": 1,
+       "docSize": 2196602,
+       "heapMB": 21,
+       "domNodes": 30,
+       "rssMB": 153
+      },
+      "state": {
+       "ms": 94,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 27,
+       "domNodes": 30,
+       "rssMB": 160
+      },
+      "mount": {
+       "ms": 109726,
+       "scriptMs": 1,
+       "layoutMs": 619,
+       "styleMs": 217,
+       "domNodes": 112035,
+       "heapMB": 891,
+       "rssMB": 1576
+      },
+      "save": {
+       "ms": 1799,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 2252599,
+       "heapMB": 894,
+       "domNodes": 112035,
+       "rssMB": 1532
+      },
+      "reopen": {
+       "ms": 130615,
+       "scriptMs": 102,
+       "layoutMs": 510,
+       "styleMs": 172,
+       "heapMB": 906,
+       "domNodes": 112035,
+       "rssMB": 1655
+      }
+     },
+     "typing": {
+      "start": {
+       "samples": [
+        486,
+        449,
+        418,
+        349,
+        335,
+        368,
+        1469,
+        491,
+        452,
+        389,
+        372,
+        389
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 417,
+        "layout": 32,
+        "style": 0,
+        "task": 495
+       }
+      },
+      "middle": {
+       "samples": [
+        274,
+        290,
+        284,
+        315,
+        306,
+        318,
+        344,
+        390,
+        387,
+        346,
+        349,
+        330
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 265,
+        "layout": 24,
+        "style": 0,
+        "task": 323
+       }
+      },
+      "end": {
+       "samples": [
+        355,
+        327,
+        330,
+        342,
+        314,
+        402,
+        429,
+        386,
+        439,
+        457,
+        451,
+        441
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 315,
+        "layout": 30,
+        "style": 0,
+        "task": 385
+       }
+      }
+     },
+     "scroll": [
+      {
+       "fraction": 0.25,
+       "ms": 88.10000000009313,
+       "blank": 0
+      },
+      {
+       "fraction": 0.75,
+       "ms": 74.30000000004657,
+       "blank": 0
+      },
+      {
+       "fraction": 0.5,
+       "ms": 90.5,
+       "blank": 0
+      },
+      {
+       "fraction": 0.1,
+       "ms": 100.80000000004657,
+       "blank": 0
+      },
+      {
+       "fraction": 0.9,
+       "ms": 78.69999999995343,
+       "blank": 0
+      }
+     ],
+     "pageErrors": [],
+     "roundTrip": {
+      "savedBytes": 2252599,
+      "originalBytes": 2171400,
+      "identical": false
+     },
+     "copyAllChars": 2140598,
+     "arrowWalk": {
+      "presses": 40,
+      "moved": 40
+     },
+     "endRssMB": 1947
+    },
+    {
+     "status": "ok",
+     "stages": {
+      "corpus": {
+       "ms": 0,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 2171400,
+       "heapMB": 5,
+       "domNodes": 25,
+       "rssMB": 109
+      },
+      "boot": {
+       "ms": 203,
+       "scriptMs": 58,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 132
+      },
+      "read": {
+       "ms": 5,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 10,
+       "domNodes": 30,
+       "rssMB": 136
+      },
+      "parse": {
+       "ms": 4710,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "topLevelBlocks": 1,
+       "docSize": 2196602,
+       "heapMB": 21,
+       "domNodes": 30,
+       "rssMB": 152
+      },
+      "state": {
+       "ms": 83,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 26,
+       "domNodes": 30,
+       "rssMB": 160
+      },
+      "mount": {
+       "ms": 107875,
+       "scriptMs": 1,
+       "layoutMs": 489,
+       "styleMs": 110,
+       "domNodes": 112035,
+       "heapMB": 891,
+       "rssMB": 1572
+      },
+      "save": {
+       "ms": 1613,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 2252599,
+       "heapMB": 894,
+       "domNodes": 112035,
+       "rssMB": 1530
+      },
+      "reopen": {
+       "ms": 138244,
+       "scriptMs": 81,
+       "layoutMs": 449,
+       "styleMs": 127,
+       "heapMB": 906,
+       "domNodes": 112035,
+       "rssMB": 1659
+      }
+     },
+     "typing": {
+      "start": {
+       "samples": [
+        433,
+        332,
+        324,
+        331,
+        336,
+        1335,
+        378,
+        353,
+        388,
+        369,
+        306,
+        368
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 373,
+        "layout": 24,
+        "style": 0,
+        "task": 433
+       }
+      },
+      "middle": {
+       "samples": [
+        333,
+        350,
+        354,
+        293,
+        355,
+        378,
+        367,
+        310,
+        399,
+        317,
+        327,
+        315
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 272,
+        "layout": 24,
+        "style": 0,
+        "task": 329
+       }
+      },
+      "end": {
+       "samples": [
+        312,
+        362,
+        311,
+        312,
+        381,
+        368,
+        368,
+        323,
+        352,
+        341,
+        435,
+        352
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 286,
+        "layout": 27,
+        "style": 0,
+        "task": 348
+       }
+      }
+     },
+     "scroll": [
+      {
+       "fraction": 0.25,
+       "ms": 98.20000000018626,
+       "blank": 0
+      },
+      {
+       "fraction": 0.75,
+       "ms": 83.8000000002794,
+       "blank": 0
+      },
+      {
+       "fraction": 0.5,
+       "ms": 65,
+       "blank": 0
+      },
+      {
+       "fraction": 0.1,
+       "ms": 88.1999999997206,
+       "blank": 0
+      },
+      {
+       "fraction": 0.9,
+       "ms": 88.89999999990687,
+       "blank": 0
+      }
+     ],
+     "pageErrors": [],
+     "roundTrip": {
+      "savedBytes": 2252599,
+      "originalBytes": 2171400,
+      "identical": false
+     },
+     "copyAllChars": 2140598,
+     "arrowWalk": {
+      "presses": 40,
+      "moved": 40
+     },
+     "endRssMB": 1949
     }
    ]
   }
