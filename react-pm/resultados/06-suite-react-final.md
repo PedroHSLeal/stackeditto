@@ -18,6 +18,7 @@ Budgets: open (read to first paint) ≤ 1000 · typing p95 ≤ 50 · scroll sett
 | full[view-1.42.3]/all/html@2 | ok | 2.0 | **3,236** | 2,462 | 8 | 761 | 395 | 5,959 | 2,427 | 147 | **262** | **149** | 0.00 | 40/40 | 491 | 30 | 124,030 |
 | react/all/html@2 | timeout,timeout,timeout | 2.0 | – | 2,484 | 115 | – | – | – | – | – | – | – | – | – | **1,772** | – | – |
 | react-controlled/all/html@2 | timeout,timeout,timeout | 2.0 | – | 2,448 | 122 | – | – | – | – | – | – | – | – | – | **1,770** | – | – |
+| full/all/giant-block@2 | timeout,timeout,timeout | 2.0 | – | 589 | 12,621 | – | – | – | – | – | – | – | – | – | 639 | – | – |
 
 ## Notes
 
@@ -33,3 +34,4 @@ Budgets: open (read to first paint) ≤ 1000 · typing p95 ≤ 50 · scroll sett
 - `full[view-1.42.3]/all/html@2`: some keystrokes did not land in the document; saving unedited changes the file: 2,105,520 → 2,155,119 bytes
 - `react/all/html@2`: failed: __timeout__
 - `react-controlled/all/html@2`: failed: __timeout__
+- `full/all/giant-block@2`: failed: __timeout__
