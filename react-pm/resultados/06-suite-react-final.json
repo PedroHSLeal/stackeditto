@@ -223,6 +223,115 @@
    "overBudget": [
     "openMs"
    ]
+  },
+  {
+   "id": "react/all/tables@0.25",
+   "status": "ok",
+   "runs": 3,
+   "corpusBytes": 219840,
+   "openMs": 9888,
+   "stages": {
+    "corpus": {
+     "ms": 0,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 5,
+     "domNodes": 25,
+     "rssMB": 109,
+     "bytes": 219840
+    },
+    "boot": {
+     "ms": 203,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 67,
+     "heapMB": 9,
+     "domNodes": 29,
+     "rssMB": 132
+    },
+    "read": {
+     "ms": 1,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 10,
+     "domNodes": 30,
+     "rssMB": 133
+    },
+    "parse": {
+     "ms": 6920,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 14,
+     "domNodes": 30,
+     "rssMB": 143,
+     "topLevelBlocks": 400
+    },
+    "state": {
+     "ms": 35,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 15,
+     "domNodes": 30,
+     "rssMB": 144
+    },
+    "mount": {
+     "ms": 2932,
+     "layoutMs": 85,
+     "styleMs": 32,
+     "scriptMs": 1,
+     "heapMB": 265,
+     "domNodes": 26434,
+     "rssMB": 487
+    },
+    "save": {
+     "ms": 6,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 265,
+     "domNodes": 26434,
+     "rssMB": 476,
+     "error": "Cannot handle unknown node `table`"
+    },
+    "reopen": {
+     "ms": 11369,
+     "layoutMs": 84,
+     "styleMs": 31,
+     "scriptMs": 24,
+     "heapMB": 270,
+     "domNodes": 26434,
+     "rssMB": 530
+    }
+   },
+   "typeP50": 95,
+   "typeP95": 130,
+   "typeLanded": true,
+   "scrollP95": 32.39999999990687,
+   "blank": 0,
+   "typingPerKeyMs": {
+    "script": 77,
+    "layout": 1,
+    "style": 0,
+    "task": 87
+   },
+   "arrowWalk": {
+    "presses": 40,
+    "moved": 40
+   },
+   "roundTrip": {
+    "error": "page.evaluate: Error: Cannot handle unknown node `table`\n    at Object.unknown (http://localhost:5198/node_modules/.vite-playground-react/deps/chunk-4D4FVZHO.js?v=4a70777c:1540:9)\n    at Object.one [a"
+   },
+   "copyAllChars": 190238,
+   "rssMB": 634,
+   "pageErrors": [],
+   "overBudget": [
+    "openMs",
+    "typeP95"
+   ]
   }
  ],
  "raw": [
@@ -1387,6 +1496,585 @@
       "moved": 40
      },
      "endRssMB": 225
+    }
+   ]
+  },
+  {
+   "scenario": {
+    "id": "react/all/tables@0.25",
+    "strategy": "react",
+    "plugins": "all",
+    "kind": "tables",
+    "sizeMB": 0.25,
+    "view": "1.42.3"
+   },
+   "runs": [
+    {
+     "status": "ok",
+     "stages": {
+      "corpus": {
+       "ms": 0,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 219840,
+       "heapMB": 5,
+       "domNodes": 25,
+       "rssMB": 109
+      },
+      "boot": {
+       "ms": 212,
+       "scriptMs": 75,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 132
+      },
+      "read": {
+       "ms": 1,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 10,
+       "domNodes": 30,
+       "rssMB": 134
+      },
+      "parse": {
+       "ms": 6920,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "topLevelBlocks": 400,
+       "docSize": 199840,
+       "heapMB": 14,
+       "domNodes": 30,
+       "rssMB": 145
+      },
+      "state": {
+       "ms": 28,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 15,
+       "domNodes": 30,
+       "rssMB": 145
+      },
+      "mount": {
+       "ms": 2932,
+       "scriptMs": 1,
+       "layoutMs": 85,
+       "styleMs": 33,
+       "domNodes": 26434,
+       "heapMB": 265,
+       "rssMB": 487
+      },
+      "save": {
+       "ms": 6,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "error": "Cannot handle unknown node `table`",
+       "heapMB": 265,
+       "domNodes": 26434,
+       "rssMB": 476
+      },
+      "reopen": {
+       "ms": 13206,
+       "scriptMs": 25,
+       "layoutMs": 84,
+       "styleMs": 31,
+       "heapMB": 270,
+       "domNodes": 26434,
+       "rssMB": 530
+      }
+     },
+     "typing": {
+      "start": {
+       "samples": [
+        111,
+        103,
+        119,
+        90,
+        87,
+        110,
+        100,
+        83,
+        113,
+        129,
+        80,
+        86
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 84,
+        "layout": 1,
+        "style": 0,
+        "task": 97
+       }
+      },
+      "middle": {
+       "samples": [
+        111,
+        106,
+        71,
+        78,
+        80,
+        97,
+        92,
+        95,
+        90,
+        72,
+        77,
+        87
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 77,
+        "layout": 1,
+        "style": 0,
+        "task": 87
+       }
+      },
+      "end": {
+       "samples": [
+        117,
+        81,
+        107,
+        79,
+        96,
+        117,
+        76,
+        102,
+        72,
+        95,
+        94,
+        102
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 83,
+        "layout": 2,
+        "style": 0,
+        "task": 93
+       }
+      }
+     },
+     "scroll": [
+      {
+       "fraction": 0.25,
+       "ms": 20.899999999906868,
+       "blank": 0
+      },
+      {
+       "fraction": 0.75,
+       "ms": 28.699999999720603,
+       "blank": 0
+      },
+      {
+       "fraction": 0.5,
+       "ms": 31.300000000279397,
+       "blank": 0
+      },
+      {
+       "fraction": 0.1,
+       "ms": 31.399999999906868,
+       "blank": 0
+      },
+      {
+       "fraction": 0.9,
+       "ms": 31.40000000037253,
+       "blank": 0
+      }
+     ],
+     "pageErrors": [],
+     "roundTrip": {
+      "error": "page.evaluate: Error: Cannot handle unknown node `table`\n    at Object.unknown (http://localhost:5198/node_modules/.vite-playground-react/deps/chunk-4D4FVZHO.js?v=4a70777c:1540:9)\n    at Object.one [a"
+     },
+     "copyAllChars": 190238,
+     "arrowWalk": {
+      "presses": 40,
+      "moved": 40
+     },
+     "endRssMB": 645
+    },
+    {
+     "status": "ok",
+     "stages": {
+      "corpus": {
+       "ms": 0,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 219840,
+       "heapMB": 5,
+       "domNodes": 25,
+       "rssMB": 109
+      },
+      "boot": {
+       "ms": 203,
+       "scriptMs": 67,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 132
+      },
+      "read": {
+       "ms": 1,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 10,
+       "domNodes": 30,
+       "rssMB": 133
+      },
+      "parse": {
+       "ms": 6223,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "topLevelBlocks": 400,
+       "docSize": 199840,
+       "heapMB": 14,
+       "domNodes": 30,
+       "rssMB": 143
+      },
+      "state": {
+       "ms": 35,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 15,
+       "domNodes": 30,
+       "rssMB": 144
+      },
+      "mount": {
+       "ms": 3020,
+       "scriptMs": 1,
+       "layoutMs": 93,
+       "styleMs": 32,
+       "domNodes": 26434,
+       "heapMB": 265,
+       "rssMB": 489
+      },
+      "save": {
+       "ms": 6,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "error": "Cannot handle unknown node `table`",
+       "heapMB": 265,
+       "domNodes": 26434,
+       "rssMB": 476
+      },
+      "reopen": {
+       "ms": 11369,
+       "scriptMs": 22,
+       "layoutMs": 57,
+       "styleMs": 23,
+       "heapMB": 270,
+       "domNodes": 26434,
+       "rssMB": 531
+      }
+     },
+     "typing": {
+      "start": {
+       "samples": [
+        140,
+        118,
+        78,
+        135,
+        110,
+        128,
+        108,
+        123,
+        117,
+        126,
+        130,
+        127
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 103,
+        "layout": 2,
+        "style": 0,
+        "task": 119
+       }
+      },
+      "middle": {
+       "samples": [
+        79,
+        95,
+        146,
+        121,
+        136,
+        114,
+        81,
+        87,
+        94,
+        81,
+        97,
+        83
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 88,
+        "layout": 1,
+        "style": 0,
+        "task": 102
+       }
+      },
+      "end": {
+       "samples": [
+        99,
+        80,
+        128,
+        90,
+        114,
+        110,
+        122,
+        87,
+        76,
+        90,
+        92,
+        97
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 86,
+        "layout": 2,
+        "style": 0,
+        "task": 97
+       }
+      }
+     },
+     "scroll": [
+      {
+       "fraction": 0.25,
+       "ms": 12.399999999906868,
+       "blank": 0
+      },
+      {
+       "fraction": 0.75,
+       "ms": 30.600000000093132,
+       "blank": 0
+      },
+      {
+       "fraction": 0.5,
+       "ms": 30.5,
+       "blank": 0
+      },
+      {
+       "fraction": 0.1,
+       "ms": 32.39999999990687,
+       "blank": 0
+      },
+      {
+       "fraction": 0.9,
+       "ms": 28.800000000279397,
+       "blank": 0
+      }
+     ],
+     "pageErrors": [],
+     "roundTrip": {
+      "error": "page.evaluate: Error: Cannot handle unknown node `table`\n    at Object.unknown (http://localhost:5198/node_modules/.vite-playground-react/deps/chunk-4D4FVZHO.js?v=4a70777c:1540:9)\n    at Object.one [a"
+     },
+     "copyAllChars": 190238,
+     "arrowWalk": {
+      "presses": 40,
+      "moved": 40
+     },
+     "endRssMB": 634
+    },
+    {
+     "status": "ok",
+     "stages": {
+      "corpus": {
+       "ms": 0,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 219840,
+       "heapMB": 5,
+       "domNodes": 25,
+       "rssMB": 111
+      },
+      "boot": {
+       "ms": 169,
+       "scriptMs": 53,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 132
+      },
+      "read": {
+       "ms": 1,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 10,
+       "domNodes": 30,
+       "rssMB": 133
+      },
+      "parse": {
+       "ms": 7363,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "topLevelBlocks": 400,
+       "docSize": 199840,
+       "heapMB": 14,
+       "domNodes": 30,
+       "rssMB": 141
+      },
+      "state": {
+       "ms": 38,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 15,
+       "domNodes": 30,
+       "rssMB": 143
+      },
+      "mount": {
+       "ms": 2389,
+       "scriptMs": 1,
+       "layoutMs": 63,
+       "styleMs": 22,
+       "domNodes": 26434,
+       "heapMB": 265,
+       "rssMB": 487
+      },
+      "save": {
+       "ms": 5,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "error": "Cannot handle unknown node `table`",
+       "heapMB": 265,
+       "domNodes": 26434,
+       "rssMB": 469
+      },
+      "reopen": {
+       "ms": 10068,
+       "scriptMs": 24,
+       "layoutMs": 84,
+       "styleMs": 34,
+       "heapMB": 270,
+       "domNodes": 26434,
+       "rssMB": 524
+      }
+     },
+     "typing": {
+      "start": {
+       "samples": [
+        129,
+        100,
+        98,
+        101,
+        69,
+        82,
+        70,
+        76,
+        71,
+        70,
+        102,
+        103
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 76,
+        "layout": 1,
+        "style": 0,
+        "task": 89
+       }
+      },
+      "middle": {
+       "samples": [
+        80,
+        94,
+        141,
+        107,
+        98,
+        90,
+        69,
+        76,
+        70,
+        68,
+        68,
+        66
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 75,
+        "layout": 1,
+        "style": 0,
+        "task": 87
+       }
+      },
+      "end": {
+       "samples": [
+        112,
+        99,
+        115,
+        87,
+        76,
+        65,
+        70,
+        61,
+        69,
+        84,
+        103,
+        98
+       ],
+       "landed": true,
+       "perKeyMs": {
+        "script": 75,
+        "layout": 1,
+        "style": 0,
+        "task": 85
+       }
+      }
+     },
+     "scroll": [
+      {
+       "fraction": 0.25,
+       "ms": 17.600000000093132,
+       "blank": 0
+      },
+      {
+       "fraction": 0.75,
+       "ms": 30.700000000186265,
+       "blank": 0
+      },
+      {
+       "fraction": 0.5,
+       "ms": 30.699999999720603,
+       "blank": 0
+      },
+      {
+       "fraction": 0.1,
+       "ms": 30.800000000279397,
+       "blank": 0
+      },
+      {
+       "fraction": 0.9,
+       "ms": 30.800000000279397,
+       "blank": 0
+      }
+     ],
+     "pageErrors": [],
+     "roundTrip": {
+      "error": "page.evaluate: Error: Cannot handle unknown node `table`\n    at Object.unknown (http://localhost:5198/node_modules/.vite-playground-react/deps/chunk-4D4FVZHO.js?v=4a70777c:1540:9)\n    at Object.one [a"
+     },
+     "copyAllChars": 190238,
+     "arrowWalk": {
+      "presses": 40,
+      "moved": 40
+     },
+     "endRssMB": 633
     }
    ]
   }
