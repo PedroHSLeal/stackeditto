@@ -92,7 +92,7 @@ Todas usam o mesmo parser, schema, plugins (`all`) e node view de bloco HTML.
 
 ## Resultados (parciais)
 
-A rodada `--suite react` foi **interrompida em 12 de 36 cenários**: os documentos de 0,6 MB, 2 MB (fixture) e
+A rodada `--suite react` foi **interrompida em 12 de 36 cenários** (os 24 restantes rodam em `resultados/05-suite-react-restante.*`): os documentos de 0,6 MB, 2 MB (fixture) e
 2 MB (prosa) estão completos, com 3 repetições cada. Faltam listas, tabelas, código, blocos HTML, bloco gigante e
 8 MB. Os arquivos brutos estão em [`resultados/`](./resultados/README.md), com React em build de produção e
 Chromium 157 headless.
@@ -131,17 +131,34 @@ O que dá para afirmar até aqui:
 
 ### Pontos abertos
 
-- **Corrida de seleção:** uma tecla digitada logo depois de mover o cursor (clique + `End` sem pausa) entra na
-  seleção **antiga**. Numa das vezes, substituiu o título inteiro. Com 30 ms de pausa não acontece.
-  Reprodução: `testes/space2.cjs`. A comparação sistemática com o editor do app é
-  `scripts/pm-perf/react-race.mjs`, escrita mas **ainda não executada**.
+- **Corrida de seleção (confirmada):** uma tecla digitada logo depois de mover o cursor nativamente entra na
+  seleção **antiga**. Resultado de `scripts/pm-perf/react-race.mjs --trials 15`
+  ([resultados/04-corrida-de-selecao.md](./resultados/04-corrida-de-selecao.md)), em acertos por pausa entre
+  mover o cursor e digitar:
+
+  | editor | sequência | 0 ms | 10 ms | 30 ms | 100 ms |
+  | --- | --- | ---: | ---: | ---: | ---: |
+  | app (1.41.0 + patches) | clique + End + digitar | 15/15 | 15/15 | 15/15 | 15/15 |
+  | app (1.41.0 + patches) | End + ↓ + digitar | 15/15 | 15/15 | 15/15 | 15/15 |
+  | EditorView 1.42.3 | os dois | 15/15 | 15/15 | 15/15 | 15/15 |
+  | react-prosemirror | clique + End + digitar | **12/15** | 15/15 | 15/15 | 15/15 |
+  | react-prosemirror | End + ↓ + digitar | **13/15** | 15/15 | 15/15 | 15/15 |
+  | react-prosemirror controlado | clique + End + digitar | **9/15** | **13/15** | 15/15 | 15/15 |
+  | react-prosemirror controlado | End + ↓ + digitar | **13/15** | 15/15 | 15/15 | 15/15 |
+
+  Os erros não são só de posição: várias vezes o título inteiro foi **substituído** pelo texto digitado
+  (`"XYXYXY" → "XY"`), o que é perda de conteúdo. O `EditorView` relê a seleção do DOM antes de tratar a
+  digitação; pelo comportamento, o react-prosemirror usa a seleção do state, que só é atualizada no próximo
+  `selectionchange`. Uma pessoa raramente digita menos de 10–30 ms depois de um clique, mas atalhos, macros de
+  teclado e testes automatizados fazem isso.
 - **O save sai diferente:** com o mesmo documento sem edição, o markdown salvo pelo React tem alguns bytes a menos
   que o do `EditorView` (fixture: 471.280 vs 471.297; 2,3 MB: 1.885.123 vs 1.885.191). Na prosa, que não tem
   listas nem tabelas, os dois batem. Falta descobrir qual bloco muda.
 - Uma das 3 execuções de `react-controlled` no fixture falhou com "Execution context was destroyed": o Vite
   recarregou a página no meio da execução. É um problema do harness, não da biblioteca.
-- Ainda **não verificados**: `npm run react-pm:build` e o `npm run type-check` completo. O
-  `tsconfig.react-pm.json` passou sozinho.
+- Verificado: o `npm run react-pm:build` gera o build e o preview funciona (abrir, bloco HTML, digitar, Ctrl+S).
+  O `npm run type-check` acusa só os erros que já existiam antes desta branch (`App.vue`, `ExtensionModal.vue`,
+  playground e o `lib` do `@tsconfig/node22`); nada em `react-pm/` nem no `tsconfig.react-pm.json`.
 
 ### Onde o react-prosemirror tende a ser bom
 
