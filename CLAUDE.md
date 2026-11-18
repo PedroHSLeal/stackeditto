@@ -19,6 +19,7 @@ npm run build               # type-check + build in parallel
 npm run build-only          # vite build, no type-check (what CI deploys)
 npm run test:unit           # vitest (watch mode)
 npm run new-playground foo  # scaffold playground/foo + link it from playground/index.html
+npm run perf:fs -- --first 2 # File System Access benchmark (OPFS x local folder, stream reads); results in perf-results/
 ```
 
 Single test runs (no wrapper script, call vitest directly):

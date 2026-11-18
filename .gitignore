@@ -159,7 +159,8 @@ dist
 # Stackanditto playground tests
 playground/*
 !playground/pm-perf/
-# pm-perf benchmark output
+!playground/fs-bench/
+# pm-perf / fs-bench benchmark output
 perf-results
 
 # Claude Code worktrees

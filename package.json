@@ -13,6 +13,7 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "perf:pm": "node scripts/pm-perf/run.mjs",
+    "perf:fs": "node scripts/fs-bench/run.mjs",
     "postinstall": "patch-package"
   },
   "dependencies": {

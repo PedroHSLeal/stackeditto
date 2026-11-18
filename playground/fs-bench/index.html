@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PG - fs-bench</title>
+  <style>
+    body { margin: 0; padding: 16px; font-family: ui-monospace, monospace; font-size: 13px; }
+    fieldset { margin-bottom: 12px; }
+    label { margin-right: 12px; }
+    button { margin-right: 8px; }
+    pre { white-space: pre-wrap; background: #f4f4f4; padding: 8px; }
+  </style>
+</head>
+
+<body>
+  <h2>File System Access: OPFS x showDirectoryPicker x stream</h2>
+  <p>
+    Roda a mesma suite que <code>npm run perf:fs</code>. O botao do picker escreve as fixtures em
+    <code>stackeditto-fs-bench/</code> dentro da pasta escolhida e compara com o OPFS.
+    Soltar uma pasta aqui (que ja tenha as fixtures) adiciona o subject <code>local</code>, somente leitura.
+  </p>
+  <fieldset id="stages"><legend>stages</legend></fieldset>
+  <fieldset>
+    <legend>opcoes</legend>
+    <label>tamanhos <input id="sizes" size="30"></label>
+    <label>repeticoes <input id="repeat" type="number" value="5" style="width: 4em"></label>
+  </fieldset>
+  <button id="run-opfs">Rodar so no OPFS</button>
+  <button id="run-picker">Escolher pasta (showDirectoryPicker) e rodar com OPFS</button>
+  <button id="copy">Copiar JSON</button>
+  <pre id="log"></pre>
+  <pre id="report"></pre>
+  <script type="module" src="/fs-bench/main.ts"></script>
+</body>
+
+</html>
