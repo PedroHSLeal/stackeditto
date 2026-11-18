@@ -90,21 +90,25 @@ Se o navegador do Playwright desta versão não estiver instalado, passe `--exec
 
 Todas usam o mesmo parser, schema, plugins (`all`) e node view de bloco HTML.
 
-## Resultados (parciais)
+## Resultados
 
-A rodada `--suite react` foi **interrompida em 12 de 36 cenários** (os 24 restantes rodam em `resultados/05-suite-react-restante.*`): os documentos de 0,6 MB, 2 MB (fixture) e
-2 MB (prosa) estão completos, com 3 repetições cada. Faltam listas, tabelas, código, blocos HTML, bloco gigante e
-8 MB. Os arquivos brutos estão em [`resultados/`](./resultados/README.md), com React em build de produção e
-Chromium 157 headless.
+`npm run perf:pm -- --suite react`, React em build de produção, Chromium 157 headless shell, 3 execuções por
+cenário (medianas) e limite de 5 min por execução. A suíte rodou em quatro partes; os arquivos brutos estão em
+[`resultados/`](./resultados/README.md) (01 a 07).
 
-Medianas, em ms, exceto onde indicado:
+Em ms, exceto memória. "abrir" vai da leitura do arquivo até o primeiro frame pintado; "montar" é só criar o DOM
+do editor; "memória" é o processo de renderização inteiro.
 
-| documento | variante | abrir | montagem | tecla p50 | tecla p95 | memória (MB) |
+| documento | variante | abrir | montar | tecla p50 | tecla p95 | memória (MB) |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | fixture 0,6 MB | app (`full`) | 820 | 160 | 21 | 33 | 235 |
 | | EditorView 1.42.3 | 834 | 161 | 29 | 48 | 234 |
 | | react-prosemirror | 2.071 | 1.422 | 37 | 63 | 356 |
 | | react-prosemirror controlado | 2.096 | 1.473 | 39 | 54 | 357 |
+| tabelas 0,25 MB | app (`full`) | 9.053 | 269 | 23 | 32 | 226 |
+| | EditorView 1.42.3 | 9.388 | 240 | 22 | 31 | 225 |
+| | react-prosemirror | 9.888 | 2.932 | 95 | **130** | 634 |
+| | react-prosemirror controlado | 11.116 | 2.706 | 90 | **117** | 612 |
 | fixture 2,3 MB | app (`full`) | 2.734 | 591 | 70 | 100 | 402 |
 | | EditorView 1.42.3 | 3.035 | 568 | 127 | 182 | 400 |
 | | react-prosemirror | **20.330** | **17.511** | 191 | 274 | 887 |
@@ -113,21 +117,50 @@ Medianas, em ms, exceto onde indicado:
 | | EditorView 1.42.3 | 3.893 | 607 | 110 | 155 | 404 |
 | | react-prosemirror | **13.520** | **10.520** | 178 | 253 | **1.411** |
 | | react-prosemirror controlado | **13.086** | **10.282** | 203 | 316 | **1.419** |
+| listas 2,1 MB | app (`full`) | 5.446 | 836 | 114 | 155 | 592 |
+| | EditorView 1.42.3 | 5.936 | 1.045 | 113 | 173 | 594 |
+| | react-prosemirror (1 de 3 estourou o limite) | **117.626** | **112.743** | 322 | 417 | **1.945** |
+| | react-prosemirror controlado | **114.535** | **109.726** | 353 | 486 | **1.947** |
+| código 2,0 MB | app (`full`) | 20.508 | 4.125 | 810 | 1.015 | 1.302 |
+| | EditorView 1.42.3 | 35.126 | 4.633 | 1.288 | 1.809 | 1.279 |
+| | react-prosemirror | **84.580** | **54.829** | 1.224 | 1.674 | **2.673** |
+| | react-prosemirror controlado | **83.677** | **54.308** | 1.243 | 1.772 | **2.674** |
+| blocos HTML 2,0 MB | app (`full`) | 3.556 | 874 | 157 | 249 | 493 |
+| | EditorView 1.42.3 | 3.236 | 761 | 147 | 262 | 491 |
+| | react-prosemirror | **não abre** (> 5 min nas 3) | – | – | – | **1.772** |
+| | react-prosemirror controlado | **não abre** (> 5 min nas 3) | – | – | – | **1.770** |
+| fixture 8 MB | app (`full`) | 20.805 | 2.310 | 357 | 502 | 996 |
+| | EditorView 1.42.3 | 24.233 | 2.822 | 1.495 | 1.939 | 834 |
+| | react-prosemirror | **não abre** (> 5 min nas 3) | – | – | – | **1.746** |
+| | react-prosemirror controlado | **não abre** (> 5 min nas 3) | – | – | – | **1.755** |
 
-O que dá para afirmar até aqui:
+Fora da comparação: **tabelas de 2 MB** travam no parse markdown (código compartilhado) e **um bloco de código
+único de 2 MB** não termina de montar nem no editor do app. Os dois estouraram o limite nas 3 execuções do `full`,
+e as outras variantes foram puladas. Esses são problemas do app hoje, independentes do renderizador.
 
-- **A montagem é o gargalo.** Parse, criação do state e serialização custam praticamente o mesmo nas quatro
-  variantes, porque o código é o mesmo. A diferença está toda em montar o DOM. Com 0,6 MB, o React leva ~9× mais
-  que o `EditorView` (1,4 s vs 0,16 s); com 2,3 MB, ~30× (17,5 s vs 0,57 s). O custo cresce mais rápido que o
-  tamanho do arquivo: 3,8× mais texto deu 12× mais tempo.
-- **Digitação:** o p95 por tecla fica 1,5× a 2× pior que o do `EditorView` na mesma versão. Com 0,6 MB, ainda
-  fica perto do orçamento de 50 ms (54–63 ms); com 2 MB, passa de 250 ms.
-- **Memória:** 1,5× com 0,6 MB, 2,2× com 2,3 MB e 3,5× com prosa de 2 MB (1,4 GB, acima do orçamento de 1 GB).
-  O heap JS vai de 36 para 670 MB por causa das fibras do React, uma por nó.
-- **Rolagem e navegação com setas** ficam iguais nas quatro variantes, porque não renderizam nada novo.
-- **Controlado vs não controlado:** praticamente igual. Subir o state para o React não é o problema.
-- **Os patches do app pesam:** na mesma versão sem patches (1.42.3), o p95 de tecla com 2,3 MB passa de 100 para
-  182 ms. Ao trocar de renderizador, esse ganho seria perdido além do custo do React.
+### Conclusões
+
+- **Não há nenhum caso medido em que o react-prosemirror seja mais rápido.** Na melhor situação (código, em que
+  o realce do Shiki domina tudo) ele empata na digitação com o `EditorView` na mesma versão. Em todos os outros
+  casos ele fica atrás, e em arquivos grandes fica muito atrás.
+- **O gargalo é a montagem.** Parse, state e serialização são o mesmo código e custam o mesmo. Montar o documento
+  com React custa, em relação ao `EditorView` 1.42.3: **9×** com 0,6 MB, **12×** em tabelas pequenas e em código,
+  **17×** em prosa, **31×** no fixture de 2,3 MB, **108×** em listas e **mais de 100×** no fixture de 8 MB. Com
+  blocos HTML de extensão a montagem passa de 5 minutos, contra 0,76 s. O custo cresce mais rápido que o tamanho
+  e explode em estruturas aninhadas (listas) e com node views clássicos (blocos HTML).
+- **Os blocos HTML são o pior caso, e são o recurso central das extensões.** No react-prosemirror, o
+  `HtmlBlockView` entra como `NodeViewConstructor` clássico pela prop `nodeViews`. A hipótese, ainda não
+  verificada, é que esse caminho de compatibilidade tenha um custo alto por instância. Reescrever o node view como
+  componente React (`nodeViewComponents`) seria o próximo teste.
+- **Digitação:** p95 de 1,5× a 4× pior (tabelas pequenas: 130 vs 31 ms), exceto em código.
+- **Memória:** 1,5× a 3,5× maior, até 2,7 GB. O heap JS passa de 30–150 MB para 0,3–1,2 GB, porque o React guarda
+  uma fibra por nó do documento.
+- **Rolagem e navegação com setas** ficam iguais nas quatro variantes.
+- **Controlado vs não controlado** dá resultados praticamente iguais. Subir o state para o React não é o
+  problema; o custo está na renderização do documento.
+- **Os patches de `patches/` são importantes.** Sem eles, o mesmo `EditorView` na 1.42.3 digita até 4× pior no
+  fixture de 8 MB (p95 1.939 vs 502 ms) e abre código 1,7× mais devagar. Uma troca para o react-prosemirror
+  perderia esses ganhos, porque a biblioteca fixa a 1.42.3, e somaria o custo do React.
 
 ### Pontos abertos
 
@@ -156,6 +189,8 @@ O que dá para afirmar até aqui:
   listas nem tabelas, os dois batem. Falta descobrir qual bloco muda.
 - Uma das 3 execuções de `react-controlled` no fixture falhou com "Execution context was destroyed": o Vite
   recarregou a página no meio da execução. É um problema do harness, não da biblioteca.
+- Salvar o arquivo de tabelas falha nas 4 variantes ("Cannot handle unknown node `table`"): o serializador
+  markdown do app não exporta tabelas. É um bug que já existia, registrado em `docs/code-review.md`.
 - Verificado: o `npm run react-pm:build` gera o build e o preview funciona (abrir, bloco HTML, digitar, Ctrl+S).
   O `npm run type-check` acusa só os erros que já existiam antes desta branch (`App.vue`, `ExtensionModal.vue`,
   playground e o `lib` do `@tsconfig/node22`); nada em `react-pm/` nem no `tsconfig.react-pm.json`.
@@ -165,6 +200,17 @@ O que dá para afirmar até aqui:
 Os posts da Handle with Care tratam de **integrar ProseMirror com uma UI em React**: node views em componentes
 React sem portais, sem *state tearing* entre o React e o EditorView, e menos re-renders do React por tecla dentro
 desse modelo. Nada disso é sobre ser mais rápido que o `EditorView` puro, que é o que o Stackeditto usa hoje (e em
-Vue). Para este projeto, a troca só compensaria se as extensões (`registerHtmlBlock`) passassem a ser componentes
-React. O preço medido é abertura de 9× a 30× mais lenta, teclas 1,5× a 2× mais lentas e muito mais memória em
-arquivos grandes.
+Vue).
+
+Para o Stackeditto, ele faria sentido se o app migrasse para React e quisesse extensões escritas como componentes
+React, aceitando arquivos pequenos (bem abaixo de 0,6 MB) como limite. Para o objetivo de performance, os números
+apontam o contrário: as melhorias continuam no caminho que o projeto já segue, com patches no prosemirror-view,
+windowing (`pm-window`), realce incremental e o parse de tabelas.
+
+### Próximos testes possíveis
+
+1. Reescrever o `HtmlBlockView` como `nodeViewComponents` e repetir `html@2`, para saber se o problema é o caminho
+   de compatibilidade dos node views clássicos.
+2. Medir documentos pequenos (10–100 KB), que são o caso comum de notas, para saber se a diferença é perceptível.
+3. Descobrir por que o save do React sai alguns bytes diferente no fixture.
+4. Reportar a corrida de seleção no repositório da biblioteca, com o `react-race.mjs` como reprodução.
