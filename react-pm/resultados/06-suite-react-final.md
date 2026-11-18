@@ -16,6 +16,7 @@ Budgets: open (read to first paint) ≤ 1000 · typing p95 ≤ 50 · scroll sett
 | react-controlled/all/fenced@2 | ok | 2.0 | **83,677** | 1,327 | 28,037 | 54,308 | 2,813 | 401 | 109,236 | 1,243 | **1,772** | **106** | 0.00 | 33/33 | **2,674** | 1,160 | 871,134 |
 | full/all/html@2 | ok | 2.0 | **3,556** | 2,671 | 5 | 874 | 562 | 5,781 | 2,731 | 157 | **249** | **156** | 0.00 | 40/40 | 493 | 30 | 124,030 |
 | full[view-1.42.3]/all/html@2 | ok | 2.0 | **3,236** | 2,462 | 8 | 761 | 395 | 5,959 | 2,427 | 147 | **262** | **149** | 0.00 | 40/40 | 491 | 30 | 124,030 |
+| react/all/html@2 | timeout,timeout,timeout | 2.0 | – | 2,484 | 115 | – | – | – | – | – | – | – | – | – | **1,772** | – | – |
 
 ## Notes
 
@@ -29,3 +30,4 @@ Budgets: open (read to first paint) ≤ 1000 · typing p95 ≤ 50 · scroll sett
 - `react-controlled/all/fenced@2`: saving unedited changes the file: 2,079,790 → 2,079,789 bytes
 - `full/all/html@2`: some keystrokes did not land in the document; saving unedited changes the file: 2,105,520 → 2,155,119 bytes
 - `full[view-1.42.3]/all/html@2`: some keystrokes did not land in the document; saving unedited changes the file: 2,105,520 → 2,155,119 bytes
+- `react/all/html@2`: failed: __timeout__

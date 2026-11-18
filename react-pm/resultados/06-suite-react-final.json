@@ -1116,6 +1116,73 @@
     "typeP95",
     "scrollP95"
    ]
+  },
+  {
+   "id": "react/all/html@2",
+   "status": "timeout,timeout,timeout",
+   "error": "__timeout__",
+   "runs": 3,
+   "corpusBytes": 2105520,
+   "openMs": null,
+   "stages": {
+    "corpus": {
+     "ms": 0,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 5,
+     "domNodes": 25,
+     "rssMB": 108,
+     "bytes": 2105520
+    },
+    "boot": {
+     "ms": 177,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 55,
+     "heapMB": 9,
+     "domNodes": 29,
+     "rssMB": 132
+    },
+    "read": {
+     "ms": 6,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 10,
+     "domNodes": 30,
+     "rssMB": 136
+    },
+    "parse": {
+     "ms": 2484,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 23,
+     "domNodes": 30,
+     "rssMB": 155,
+     "topLevelBlocks": 49600
+    },
+    "state": {
+     "ms": 115,
+     "layoutMs": 0,
+     "styleMs": 0,
+     "scriptMs": 0,
+     "heapMB": 28,
+     "domNodes": 30,
+     "rssMB": 162
+    }
+   },
+   "typeP50": null,
+   "typeP95": null,
+   "typeLanded": null,
+   "scrollP95": null,
+   "blank": null,
+   "rssMB": 1772,
+   "pageErrors": [],
+   "overBudget": [
+    "rssMB"
+   ]
   }
  ],
  "raw": [
@@ -6948,6 +7015,192 @@
       "moved": 40
      },
      "endRssMB": 489
+    }
+   ]
+  },
+  {
+   "scenario": {
+    "id": "react/all/html@2",
+    "strategy": "react",
+    "plugins": "all",
+    "kind": "html",
+    "sizeMB": 2,
+    "view": "1.42.3"
+   },
+   "runs": [
+    {
+     "status": "timeout",
+     "stages": {
+      "corpus": {
+       "ms": 0,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 2105520,
+       "heapMB": 5,
+       "domNodes": 25,
+       "rssMB": 108
+      },
+      "boot": {
+       "ms": 177,
+       "scriptMs": 55,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 132
+      },
+      "read": {
+       "ms": 6,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 10,
+       "domNodes": 30,
+       "rssMB": 136
+      },
+      "parse": {
+       "ms": 2484,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "topLevelBlocks": 49600,
+       "docSize": 903960,
+       "heapMB": 23,
+       "domNodes": 30,
+       "rssMB": 155
+      },
+      "state": {
+       "ms": 115,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 28,
+       "domNodes": 30,
+       "rssMB": 162
+      }
+     },
+     "typing": {},
+     "scroll": [],
+     "pageErrors": [],
+     "error": "__timeout__",
+     "rssAtFailureMB": 1772
+    },
+    {
+     "status": "timeout",
+     "stages": {
+      "corpus": {
+       "ms": 0,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 2105520,
+       "heapMB": 5,
+       "domNodes": 25,
+       "rssMB": 108
+      },
+      "boot": {
+       "ms": 184,
+       "scriptMs": 60,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 132
+      },
+      "read": {
+       "ms": 6,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 10,
+       "domNodes": 30,
+       "rssMB": 135
+      },
+      "parse": {
+       "ms": 2634,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "topLevelBlocks": 49600,
+       "docSize": 903960,
+       "heapMB": 23,
+       "domNodes": 30,
+       "rssMB": 153
+      },
+      "state": {
+       "ms": 117,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 28,
+       "domNodes": 30,
+       "rssMB": 161
+      }
+     },
+     "typing": {},
+     "scroll": [],
+     "pageErrors": [],
+     "error": "__timeout__",
+     "rssAtFailureMB": 1771
+    },
+    {
+     "status": "timeout",
+     "stages": {
+      "corpus": {
+       "ms": 0,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "bytes": 2105520,
+       "heapMB": 5,
+       "domNodes": 25,
+       "rssMB": 107
+      },
+      "boot": {
+       "ms": 175,
+       "scriptMs": 54,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 9,
+       "domNodes": 29,
+       "rssMB": 132
+      },
+      "read": {
+       "ms": 5,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 10,
+       "domNodes": 30,
+       "rssMB": 136
+      },
+      "parse": {
+       "ms": 2146,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "topLevelBlocks": 49600,
+       "docSize": 903960,
+       "heapMB": 23,
+       "domNodes": 30,
+       "rssMB": 155
+      },
+      "state": {
+       "ms": 114,
+       "scriptMs": 0,
+       "layoutMs": 0,
+       "styleMs": 0,
+       "heapMB": 28,
+       "domNodes": 30,
+       "rssMB": 163
+      }
+     },
+     "typing": {},
+     "scroll": [],
+     "pageErrors": [],
+     "error": "__timeout__",
+     "rssAtFailureMB": 1775
     }
    ]
   }
